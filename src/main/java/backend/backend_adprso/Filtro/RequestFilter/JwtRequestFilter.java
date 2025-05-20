@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import backend.backend_adprso.Entity.Response.JwtUtil;
-import backend.backend_adprso.Entity.Usuario.usuarioEntity;
+import backend.backend_adprso.Entity.Usuario.UsuarioEntity;
 import backend.backend_adprso.Repository.UsuarioRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -52,7 +52,7 @@ public class JwtRequestFilter  extends OncePerRequestFilter{
         }
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            Optional<usuarioEntity> usuario = usuarioRepository.findByEmail(email);
+            Optional<UsuarioEntity> usuario = usuarioRepository.findByEmail(email);
             if (usuario.isPresent() && jwtUtil.validateToken(jwt)) {
                 List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(email, null, authorities);
