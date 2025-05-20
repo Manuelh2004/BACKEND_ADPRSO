@@ -2,11 +2,15 @@ package backend.backend_adprso.Entity.Usuario;
 
 import java.time.LocalDate;
 
+import backend.backend_adprso.Entity.Items.SexoEntity;
+import backend.backend_adprso.Entity.Items.TipoDocumentoEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -33,4 +37,12 @@ public class UsuarioEntity {
     private String email;    
     @Column
     private String usr_password;
+    @ManyToOne
+    @JoinColumn(name = "sex_id", nullable = false)
+    private SexoEntity sexo;
+
+    // Relación con TipoDocumentoEntity
+    @ManyToOne
+    @JoinColumn(name = "tipdoc_id", nullable = false)
+    private TipoDocumentoEntity tipoDocumento;
 }
