@@ -11,7 +11,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "tamanio")
-public class TamañoEntity {
+public class TamanioEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long tam_id; 
