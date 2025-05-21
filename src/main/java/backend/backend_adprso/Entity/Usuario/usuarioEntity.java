@@ -37,6 +37,8 @@ public class UsuarioEntity {
     private String email;    
     @Column
     private String usr_password;
+
+    // Relación Sexo
     @ManyToOne
     @JoinColumn(name = "sex_id", nullable = false)
     private SexoEntity sexo;

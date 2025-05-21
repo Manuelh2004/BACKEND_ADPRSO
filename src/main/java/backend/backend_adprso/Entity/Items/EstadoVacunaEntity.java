@@ -10,11 +10,13 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "tipo_interesado")
-public class TipoInteresadoEntity {
+@Table(name = "estado_vacuna")
+public class EstadoVacunaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long tipin_id; 
+    private Long estva_id; 
     @Column
-    private String tipin_nombre;
+    private String estva_nombre;
+    @Column
+    private String estva_descripcion;
 }
