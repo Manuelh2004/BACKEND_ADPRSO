@@ -10,7 +10,7 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "gusto")
+@Table(name = "gusto") // Para los perritos
 public class GustoEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

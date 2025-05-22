@@ -21,6 +21,6 @@ public class RazaEntity {
     private String raz_nombre;
 
     @ManyToOne
-    @JoinColumn(name = "timas_id", nullable = false)
+    @JoinColumn(name = "tipma_id", nullable = false)
     private TipoMascotaEntity tipoMascota;
 }

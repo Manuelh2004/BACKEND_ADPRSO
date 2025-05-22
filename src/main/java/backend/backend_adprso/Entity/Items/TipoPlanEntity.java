@@ -10,7 +10,7 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "tipo_plan")
+@Table(name = "tipo_plan") // mensual, semestral y anual
 public class TipoPlanEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

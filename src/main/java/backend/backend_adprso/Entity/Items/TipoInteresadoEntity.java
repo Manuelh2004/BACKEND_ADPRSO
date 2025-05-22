@@ -10,7 +10,7 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "tipo_interesado")
+@Table(name = "tipo_interesado") // adoptante, interesado, voluntario
 public class TipoInteresadoEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
