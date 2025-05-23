@@ -71,8 +71,6 @@ public class ItemService {
         return razaRepository.findByTipoMascotaId(tipoMascotaId);
     }
 
-
-
     public List<TamanioEntity> ListarTamanios() {
         return tamanioRepository.findAll();
     }
