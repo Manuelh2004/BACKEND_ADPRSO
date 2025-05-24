@@ -32,20 +32,20 @@ public class UsuarioController {
 
     @PostMapping("/registrar")
     public ResponseEntity<?> registrarUsuario(@RequestBody UsuarioEntity usuario) {
-    UsuarioEntity usuarioGuardado;
+        UsuarioEntity usuarioGuardado;
 
-    if (usuario instanceof EmpleadoEntity) {
-        usuarioGuardado = usuarioService.guardarEmpleado((EmpleadoEntity) usuario);
+        if (usuario instanceof EmpleadoEntity) {
+            usuarioGuardado = usuarioService.guardarEmpleado((EmpleadoEntity) usuario);
 
-    } else if (usuario instanceof InteresadoEntity) {
-        usuarioGuardado = usuarioService.guardarInteresado((InteresadoEntity) usuario);
+        } else if (usuario instanceof InteresadoEntity) {
+            usuarioGuardado = usuarioService.guardarInteresado((InteresadoEntity) usuario);
 
-    } else {
-        return ResponseEntity.badRequest().body("Tipo de usuario no válido");
+        } else {
+            return ResponseEntity.badRequest().body("Tipo de usuario no válido");
+        }
+
+        return ResponseEntity.ok(usuarioGuardado);
     }
-
-    return ResponseEntity.ok(usuarioGuardado);
-}
 
     
 }

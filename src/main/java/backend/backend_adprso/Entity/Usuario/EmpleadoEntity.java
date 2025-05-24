@@ -4,15 +4,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+@Data
 @Entity
 @Table(name = "empleado")
-@Data
 public class EmpleadoEntity extends UsuarioEntity  {
-
-    @Column
-    private String empRol;
-    
-    @Column
-    private String empPassword;
-  
+    @Column(nullable = false)
+    private String emp_password; 
 }

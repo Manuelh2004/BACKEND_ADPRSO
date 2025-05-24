@@ -34,7 +34,7 @@ import lombok.Data;
 public class UsuarioEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_usuario;
+    private Long usr_id;
     @Column
     private String usr_nombre;
     @Column
@@ -47,10 +47,8 @@ public class UsuarioEntity {
     private String usr_telefono;
     @Column
     private LocalDate usr_fecha_nacimiento;
-    @Column(name = "usr_email", nullable = false, unique = true)
-    private String email;    
-    @Column
-    private String usr_password;
+    @Column(nullable = false, unique = true)
+    private String usr_email;   
     @ManyToOne
     @JoinColumn(name = "sex_id", nullable = false)
     private SexoEntity sexo;
