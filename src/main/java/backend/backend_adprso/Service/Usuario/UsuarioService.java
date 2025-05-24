@@ -35,5 +35,4 @@ public class UsuarioService {
     public InteresadoEntity guardarInteresado(InteresadoEntity interesado) {
         return interesadoRepository.save(interesado);
     }
-    
 }
