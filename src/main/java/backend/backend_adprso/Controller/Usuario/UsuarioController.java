@@ -3,6 +3,7 @@ package backend.backend_adprso.Controller.Usuario;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,7 +31,7 @@ public class UsuarioController {
         );
     }
 
-    @PostMapping("/registrar")
+      @PostMapping("/registrar")
     public ResponseEntity<?> registrarUsuario(@RequestBody UsuarioEntity usuario) {
         UsuarioEntity usuarioGuardado;
 
@@ -44,7 +45,7 @@ public class UsuarioController {
             return ResponseEntity.badRequest().body("Tipo de usuario no válido");
         }
 
-        return ResponseEntity.ok(usuarioGuardado);
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioGuardado);
     }
 
     

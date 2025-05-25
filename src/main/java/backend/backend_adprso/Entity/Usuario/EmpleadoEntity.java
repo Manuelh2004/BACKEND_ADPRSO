@@ -8,6 +8,6 @@ import lombok.Data;
 @Entity
 @Table(name = "empleado")
 public class EmpleadoEntity extends UsuarioEntity  {
-    @Column(nullable = false)
+    @Column
     private String emp_password; 
 }
