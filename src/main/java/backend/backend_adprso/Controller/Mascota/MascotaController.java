@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import backend.backend_adprso.Controller.Response.ApiResponse;
+import backend.backend_adprso.Entity.Mascota.MascotaConGustosDTO;
 import backend.backend_adprso.Entity.Mascota.MascotaEntity;
 import backend.backend_adprso.Service.Mascota.MascotaService;
 
@@ -44,9 +45,9 @@ public class MascotaController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<MascotaEntity>> registrarMascota(@RequestBody MascotaEntity mascota) {
-        MascotaEntity mascotaGuardada = mascotaService.RegistrarMascota(mascota);
-        ApiResponse<MascotaEntity> response = new ApiResponse<>("success", 201, mascotaGuardada, "Mascota registrada correctamente");
+    public ResponseEntity<ApiResponse<MascotaEntity>> registrarMascota(@RequestBody MascotaConGustosDTO request) {
+        MascotaEntity mascotaGuardada = mascotaService.RegistrarMascota(request.getMascota(), request.getGustosIds());
+        ApiResponse<MascotaEntity> response = new ApiResponse<>("success", 201, mascotaGuardada, "Mascota registrada correctamente con gustos");
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
