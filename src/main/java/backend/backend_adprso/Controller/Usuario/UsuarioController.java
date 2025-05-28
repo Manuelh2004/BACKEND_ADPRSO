@@ -31,7 +31,7 @@ public class UsuarioController {
         );
     }
 
-      @PostMapping("/registrar")
+    @PostMapping("/registrar")
     public ResponseEntity<?> registrarUsuario(@RequestBody UsuarioEntity usuario) {
         UsuarioEntity usuarioGuardado;
 
