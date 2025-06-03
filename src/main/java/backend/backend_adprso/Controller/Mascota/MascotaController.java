@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import backend.backend_adprso.Controller.Response.ApiResponse;
@@ -62,5 +63,16 @@ public class MascotaController {
             ApiResponse<Void> response = new ApiResponse<>("error", 404, null, "Mascota no encontrada");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<MascotaEntity>> filtrarMascotas(
+        @RequestParam(required = false) Long sexId,
+        @RequestParam(required = false) Long tamId,
+        @RequestParam(required = false) Long nienId,
+        @RequestParam(required = false) Long tipmaId) {
+
+        List<MascotaEntity> resultados = mascotaService.filtrarPorFiltros(sexId, tamId, nienId, tipmaId);
+        return ResponseEntity.ok(resultados);
     }
 }

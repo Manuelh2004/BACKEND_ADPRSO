@@ -61,10 +61,31 @@ public class MascotaService {
     public void EliminarMascota(Long id) {
         mascotaRepository.deleteById(id);
     }
-
-    // Puedes agregar métodos personalizados, por ejemplo, listar mascotas activas si tienes campo estado
+    
     public List<MascotaEntity> ListarMascotasActivas() {
-        return mascotaRepository.findByMascEstado(1); 
-        // Este método requiere que agregues findByMascEstado en el repositorio
+        return mascotaRepository.findByMascEstado(1);        
+    }
+
+    // Filtros ***********************
+    public List<MascotaEntity> filtrarPorSexo(Long sexId) {
+        return mascotaRepository.findBySexo(sexId);
+    }
+
+    public List<MascotaEntity> filtrarPorTamanio(Long tamId) {
+        return mascotaRepository.findByTamanio(tamId);
+    }
+
+    public List<MascotaEntity> filtrarPorNivelEnergia(Long nienId) {
+        return mascotaRepository.findByNivelEnergia(nienId);
+    }
+
+    public List<MascotaEntity> filtrarPorTipoMascota(Long tipmaId) {
+        return mascotaRepository.findByTipoMascota(tipmaId);
+    }
+
+    // Método para filtrar con múltiples parámetros opcionales
+
+    public List<MascotaEntity> filtrarPorFiltros(Long sexId, Long tamId, Long nienId, Long tipmaId) {
+        return mascotaRepository.findByFilters(sexId, tamId, nienId, tipmaId);
     }
 }

@@ -32,9 +32,9 @@ public class MascotaEntity {
     @Column
     private LocalDate masc_fecha_registro;
     @Column
-    private String masc_historia;
+    private String masc_historia; 
     @Column
-    private String masc_imagen;
+    private String masc_imagen; // IMAGENES
     @Column
     private String masc_observacion;   
     @Column
