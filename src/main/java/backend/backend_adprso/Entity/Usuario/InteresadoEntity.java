@@ -7,11 +7,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+@Data
 @Entity
 @Table(name ="interesado")
-@Data
 public class InteresadoEntity extends UsuarioEntity {
-    
     @Column
     private Integer inter_estado;
     @ManyToOne
