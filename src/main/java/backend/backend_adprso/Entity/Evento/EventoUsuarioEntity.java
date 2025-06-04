@@ -1,6 +1,6 @@
 package backend.backend_adprso.Entity.Evento;
 
-import backend.backend_adprso.Entity.Usuario.InteresadoEntity;
+import backend.backend_adprso.Entity.Usuario.UsuarioEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,8 +12,8 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "evento_interesado")
-public class EventoInteresadoEntity {
+@Table(name = "evento_usuario")
+public class EventoUsuarioEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long evein_id; 
@@ -22,5 +22,5 @@ public class EventoInteresadoEntity {
     private EventoEntity evento;
     @ManyToOne
     @JoinColumn(name = "usr_id", nullable = false)
-    private InteresadoEntity interesado;
+    private UsuarioEntity usuario;
 }

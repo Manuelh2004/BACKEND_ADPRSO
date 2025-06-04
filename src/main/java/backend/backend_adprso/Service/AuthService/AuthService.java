@@ -5,12 +5,10 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import backend.backend_adprso.Entity.Usuario.EmpleadoEntity;
-import backend.backend_adprso.Repository.EmpleadoRepository;
-
 @Service
 public class AuthService {
-      @Autowired
+    /*
+    @Autowired
     private EmpleadoRepository empleadoRepository;
 
     public Optional<EmpleadoEntity> login(String email, String password) {
@@ -23,5 +21,5 @@ public class AuthService {
     }
         return Optional.empty();
     }
-
+    */
 }

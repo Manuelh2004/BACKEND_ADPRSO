@@ -5,22 +5,16 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "raza")
-public class RazaEntity {
-     @Id
+@Table(name = "tipo_usuario")
+public class TipoUsuarioEntity {
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long raz_id; 
+    private Long tipus_id; 
     @Column
-    private String raz_nombre;
-
-    @ManyToOne
-    @JoinColumn(name = "tipma_id", nullable = false)
-    private TipoMascotaEntity tipoMascota;
+    private String tipus_nombre;
 }

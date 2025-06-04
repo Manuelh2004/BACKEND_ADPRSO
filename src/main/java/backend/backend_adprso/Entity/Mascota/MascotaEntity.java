@@ -34,8 +34,6 @@ public class MascotaEntity {
     @Column
     private String masc_historia; 
     @Column
-    private String masc_imagen; // IMAGENES
-    @Column
     private String masc_observacion;   
     @Column
     private Integer masc_estado;

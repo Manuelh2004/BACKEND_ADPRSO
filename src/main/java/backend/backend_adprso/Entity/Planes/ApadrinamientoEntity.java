@@ -12,31 +12,22 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+@Data
 @Entity
 @Table(name = "apadrinamiento")
-@Data
 public class ApadrinamientoEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "plap_id")
-    private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "apo_id", nullable = false)
-    private ApoyoEconomicoEntity apoyo;
+    private Long plap_id;    
+    @Column
+    private String plap_descripcion;
+    @Column
+    private String plap_estado;
 
     @ManyToOne
     @JoinColumn(name = "masc_id", nullable = false)
     private MascotaEntity mascota;
-
     @ManyToOne
     @JoinColumn(name = "tiplan_id", nullable = false)
     private TipoPlanEntity tipoPlan;
-
-    @Column(name = "plap_descripcion")
-    private String descripcion;
-
-    @Column(name = "plap_estado")
-    private String estado;
 }

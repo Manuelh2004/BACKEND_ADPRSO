@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import backend.backend_adprso.Controller.Response.ApiResponse;
-import backend.backend_adprso.Entity.Usuario.EmpleadoEntity;
 import backend.backend_adprso.Service.AuthService.AuthService;
 
 @RestController
@@ -23,7 +22,7 @@ public class AuthController {
         public String email;
         public String password;
     }
-
+    /* 
    @PostMapping("/login")
     public ResponseEntity<ApiResponse<EmpleadoEntity>> login(@RequestBody LoginRequest request) {
         Optional<EmpleadoEntity> empleado = authService.login(request.email, request.password);
@@ -47,4 +46,5 @@ public class AuthController {
             return ResponseEntity.status(401).body(response);
         }
     }
+    */
 }

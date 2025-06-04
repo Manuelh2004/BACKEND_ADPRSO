@@ -9,7 +9,6 @@ import backend.backend_adprso.Entity.Items.EstadoSaludEntity;
 import backend.backend_adprso.Entity.Items.EstadoVacunaEntity;
 import backend.backend_adprso.Entity.Items.GustoEntity;
 import backend.backend_adprso.Entity.Items.NivelEnergiaEntity;
-import backend.backend_adprso.Entity.Items.RazaEntity;
 import backend.backend_adprso.Entity.Items.TamanioEntity;
 import backend.backend_adprso.Entity.Items.TipoInteresadoEntity;
 import backend.backend_adprso.Entity.Items.TipoMascotaEntity;
@@ -18,7 +17,6 @@ import backend.backend_adprso.Repository.EstadoSaludRepository;
 import backend.backend_adprso.Repository.EstadoVacunaRepository;
 import backend.backend_adprso.Repository.GustoRepository;
 import backend.backend_adprso.Repository.NivelEnergiaRepository;
-import backend.backend_adprso.Repository.RazaRepository;
 import backend.backend_adprso.Repository.TamanioRepository;
 import backend.backend_adprso.Repository.TipoInteresadoRepository;
 import backend.backend_adprso.Repository.TipoMascotaRepository;
@@ -34,8 +32,6 @@ public class ItemService {
     GustoRepository gustoRepository; 
     @Autowired 
     NivelEnergiaRepository nivelEnergiaRepository; 
-    @Autowired
-    RazaRepository razaRepository; 
     @Autowired
     TamanioRepository tamanioRepository;
     @Autowired
@@ -61,15 +57,7 @@ public class ItemService {
         return nivelEnergiaRepository.findAll();
     }
 
-    // ******************************************************************************
-    public List<RazaEntity> ListarRazas() {
-        return razaRepository.findAll();
-    }
-
-    public List<RazaEntity> ListarRazasPorTipoMascota(Long tipoMascotaId) {
-        return razaRepository.findByTipoMascotaId(tipoMascotaId);
-    }
-
+    // ******************************************************************************      
     public List<TamanioEntity> ListarTamanios() {
         return tamanioRepository.findAll();
     }

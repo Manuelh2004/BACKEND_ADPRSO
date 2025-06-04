@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,23 +41,7 @@ public class ApadrinamientoController {
     @PostMapping
     public ApadrinamientoEntity crear(@RequestBody ApadrinamientoEntity apadrinamiento) {
         return apadrinamientoService.guardar(apadrinamiento);
-    }
-
-    // Actualizar un apadrinamiento existente
-    @PutMapping("/{id}")
-    public ResponseEntity<ApadrinamientoEntity> actualizar(@PathVariable Long id, @RequestBody ApadrinamientoEntity apadrinamientoActualizado) {
-        return apadrinamientoService.buscarPorId(id)
-                .map(apadrinamientoExistente -> {
-                    // Actualizar campos necesarios
-                    apadrinamientoExistente.setApoyo(apadrinamientoActualizado.getApoyo());
-                    apadrinamientoExistente.setMascota(apadrinamientoActualizado.getMascota());
-                    apadrinamientoExistente.setTipoPlan(apadrinamientoActualizado.getTipoPlan());
-                    apadrinamientoExistente.setDescripcion(apadrinamientoActualizado.getDescripcion());
-                    apadrinamientoExistente.setEstado(apadrinamientoActualizado.getEstado());
-                    return ResponseEntity.ok(apadrinamientoService.guardar(apadrinamientoExistente));
-                }).orElse(ResponseEntity.notFound().build());
-    }
-
+    }   
     // Eliminar un apadrinamiento
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {

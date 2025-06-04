@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,7 +13,6 @@ import backend.backend_adprso.Entity.Items.EstadoSaludEntity;
 import backend.backend_adprso.Entity.Items.EstadoVacunaEntity;
 import backend.backend_adprso.Entity.Items.GustoEntity;
 import backend.backend_adprso.Entity.Items.NivelEnergiaEntity;
-import backend.backend_adprso.Entity.Items.RazaEntity;
 import backend.backend_adprso.Entity.Items.TamanioEntity;
 import backend.backend_adprso.Entity.Items.TipoInteresadoEntity;
 import backend.backend_adprso.Entity.Items.TipoMascotaEntity;
@@ -53,22 +51,7 @@ public class ItemController {
         List<NivelEnergiaEntity> lista = itemService.ListarNivelEnergia();
         String mensaje = lista.isEmpty() ? "No se encontraron niveles de energía" : null;
         return ResponseEntity.ok(new ApiResponse<>("success", 200, lista, mensaje));
-    }
-
-    @GetMapping("/razas")
-    public ResponseEntity<ApiResponse<List<RazaEntity>>> listarRazas() {
-        List<RazaEntity> lista = itemService.ListarRazas();
-        String mensaje = lista.isEmpty() ? "No se encontraron razas" : null;
-        return ResponseEntity.ok(new ApiResponse<>("success", 200, lista, mensaje));
-    }
-
-    @GetMapping("/razas/{tipma_id}") 
-    public ResponseEntity<ApiResponse<List<RazaEntity>>> listarRazasPorTipoMascota(
-            @PathVariable("tipma_id") Long tipoMascotaId) {
-        List<RazaEntity> lista = itemService.ListarRazasPorTipoMascota(tipoMascotaId);
-        String mensaje = lista.isEmpty() ? "No se encontraron razas para este tipo de mascota" : null;
-        return ResponseEntity.ok(new ApiResponse<>("success", 200, lista, mensaje));
-    }
+    }   
 
     @GetMapping("/tamanios")
     public ResponseEntity<ApiResponse<List<TamanioEntity>>> listarTamanios() {

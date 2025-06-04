@@ -3,7 +3,7 @@ package backend.backend_adprso.Entity.Adopcion;
 import java.time.LocalDate;
 
 import backend.backend_adprso.Entity.Mascota.MascotaEntity;
-import backend.backend_adprso.Entity.Usuario.InteresadoEntity;
+import backend.backend_adprso.Entity.Usuario.UsuarioEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -33,5 +33,5 @@ public class AdopcionEntity {
     private MascotaEntity mascota;
     @ManyToOne
     @JoinColumn(name = "usr_id", nullable = false)
-    private InteresadoEntity interesado;
+    private UsuarioEntity usuario;
 }
