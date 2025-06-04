@@ -23,11 +23,6 @@ public class UsuarioService {
     private TipoUsuarioRepository tipoUsuarioRepository;
     @Autowired
     private PasswordEncoder passwordEncoder; 
-
-    // Método para buscar un usuario por su nombre
-    public UsuarioEntity findByUsername(String username) {
-        return usuarioRepository.findByUsrEmail(username); // Suponiendo que buscas por el correo del usuario
-    }
     
   @Transactional
     public UsuarioEntity save(UsuarioEntity usuarioEntity) {

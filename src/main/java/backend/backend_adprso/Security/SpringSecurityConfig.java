@@ -16,15 +16,17 @@ public class SpringSecurityConfig {
         return new BCryptPasswordEncoder();
     }
    
-      @Bean
+     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http.authorizeHttpRequests( (authz) -> authz
-        .requestMatchers("/usuario").permitAll()
-        .anyRequest().authenticated())
-        .csrf(config -> config.disable())
-        .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        return http.authorizeHttpRequests(authz -> authz
+                .requestMatchers("/usuario/publico").permitAll() // Ruta pública
+                .requestMatchers("/usuario/admin").hasRole("ADMIN") // Ruta protegida
+                .anyRequest().authenticated())
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .build();
     }
+
 
 
 }
