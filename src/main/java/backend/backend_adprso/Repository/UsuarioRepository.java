@@ -11,6 +11,5 @@ import backend.backend_adprso.Entity.Usuario.UsuarioEntity;
 
 @Repository
 public interface UsuarioRepository extends JpaRepository<UsuarioEntity, Long> {
-   @Query(value = "SELECT * FROM usuario u WHERE u.usr_email = :email", nativeQuery = true)
-    Optional<UsuarioEntity> findByUsrEmail(@Param("email") String email);
+  
 }

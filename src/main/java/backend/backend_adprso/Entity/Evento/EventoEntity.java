@@ -28,5 +28,7 @@ public class EventoEntity {
     @Column
     private String even_lugar;
     @Column
+    private String even_imagen;
+    @Column
     private Integer even_estado;
 }

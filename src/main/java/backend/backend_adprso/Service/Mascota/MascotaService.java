@@ -9,10 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import backend.backend_adprso.Entity.Items.GustoEntity;
+import backend.backend_adprso.Entity.Items.ImagenEntity;
 import backend.backend_adprso.Entity.Mascota.GustoMascotaEntity;
 import backend.backend_adprso.Entity.Mascota.MascotaEntity;
 import backend.backend_adprso.Repository.GustoMascotaRepository;
 import backend.backend_adprso.Repository.GustoRepository;
+import backend.backend_adprso.Repository.ImagenRepository;
 import backend.backend_adprso.Repository.MascotaRepository;
 import jakarta.transaction.Transactional;
 
@@ -24,6 +26,8 @@ public class MascotaService {
     GustoMascotaRepository gustoMascotaRepository;
     @Autowired
     GustoRepository gustoRepository;
+    @Autowired
+    ImagenRepository imagenRepository;
 
     public List<MascotaEntity> ListarMascotas() {
         return mascotaRepository.findAll();
@@ -34,7 +38,7 @@ public class MascotaService {
     }
     
     @Transactional
-    public MascotaEntity RegistrarMascota(MascotaEntity mascota, List<Long> gustosIds) {
+    public MascotaEntity RegistrarMascota(MascotaEntity mascota, List<Long> gustosIds, List<String> imagenUrls) {
         mascota.setMasc_estado(1);
         mascota.setMasc_fecha_registro(LocalDate.now());
 
@@ -53,6 +57,20 @@ public class MascotaService {
 
         // Guardar todas las relaciones
         gustoMascotaRepository.saveAll(gustosMascota);
+
+
+        // Guardar las imágenes relacionadas con la mascota
+        if (imagenUrls != null && !imagenUrls.isEmpty()) {
+            List<ImagenEntity> imagenes = imagenUrls.stream().map(imagenUrl -> {
+                ImagenEntity imagen = new ImagenEntity();
+                imagen.setIma_url(imagenUrl);
+                imagen.setMascota(mascotaGuardada); // Relacionamos con la mascota
+                return imagen;
+            }).collect(Collectors.toList());
+
+            // Guardamos las imágenes en la base de datos
+            imagenRepository.saveAll(imagenes);
+        }
 
         return mascotaGuardada;
     }

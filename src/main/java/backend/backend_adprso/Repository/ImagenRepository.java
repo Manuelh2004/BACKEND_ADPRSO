@@ -3,9 +3,9 @@ package backend.backend_adprso.Repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import backend.backend_adprso.Entity.Items.TipoInteresadoEntity;
+import backend.backend_adprso.Entity.Items.ImagenEntity;
 
 @Repository
-public interface TipoInteresadoRepository extends JpaRepository<TipoInteresadoEntity, Long> {
+public interface ImagenRepository extends JpaRepository<ImagenEntity, Long>{
     
 }

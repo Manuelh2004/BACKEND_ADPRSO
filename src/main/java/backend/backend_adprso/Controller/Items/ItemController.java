@@ -14,9 +14,9 @@ import backend.backend_adprso.Entity.Items.EstadoVacunaEntity;
 import backend.backend_adprso.Entity.Items.GustoEntity;
 import backend.backend_adprso.Entity.Items.NivelEnergiaEntity;
 import backend.backend_adprso.Entity.Items.TamanioEntity;
-import backend.backend_adprso.Entity.Items.TipoInteresadoEntity;
 import backend.backend_adprso.Entity.Items.TipoMascotaEntity;
 import backend.backend_adprso.Entity.Items.TipoPlanEntity;
+import backend.backend_adprso.Entity.Items.TipoUsuarioEntity;
 import backend.backend_adprso.Service.Items.ItemService;
 
 @RestController
@@ -60,10 +60,10 @@ public class ItemController {
         return ResponseEntity.ok(new ApiResponse<>("success", 200, lista, mensaje));
     }
 
-    @GetMapping("/tipo_interesado")
-    public ResponseEntity<ApiResponse<List<TipoInteresadoEntity>>> listarTipoInteresado() {
-        List<TipoInteresadoEntity> lista = itemService.ListarTipoInteresado();
-        String mensaje = lista.isEmpty() ? "No se encontraron tipos de interesados" : null;
+    @GetMapping("/tipo_usuario")
+    public ResponseEntity<ApiResponse<List<TipoUsuarioEntity>>> listarTipoUsuario() {
+        List<TipoUsuarioEntity> lista = itemService.ListarTipoUsuario();
+        String mensaje = lista.isEmpty() ? "No se encontraron tipos de usuario" : null;
         return ResponseEntity.ok(new ApiResponse<>("success", 200, lista, mensaje));
     }
 
