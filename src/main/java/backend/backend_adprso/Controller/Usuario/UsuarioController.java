@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import backend.backend_adprso.Controller.Response.ApiResponse;
 import backend.backend_adprso.Entity.Usuario.UsuarioEntity;
 import backend.backend_adprso.Service.Usuario.UsuarioService;
 
@@ -20,6 +19,16 @@ import backend.backend_adprso.Service.Usuario.UsuarioService;
 public class UsuarioController {
     @Autowired
     UsuarioService usuarioService;
+
+    @GetMapping
+    public List<UsuarioEntity> list(){
+        return usuarioService.obtenerTodosUsuarios();
+    }
+
+    @PostMapping
+    public ResponseEntity<UsuarioEntity> create (@RequestBody UsuarioEntity usuario){
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.save(usuario)); 
+    }
 
    
 }
