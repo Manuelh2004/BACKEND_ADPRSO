@@ -76,15 +76,22 @@ public class MascotaService {
     }
     
 
+   @Transactional
     public void EliminarMascota(Long id) {
+        // Primero, eliminamos las relaciones en la tabla gusto_mascota
+        List<GustoMascotaEntity> gustoMascotas = gustoMascotaRepository.findByMascotaId(id);
+        gustoMascotaRepository.deleteAll(gustoMascotas); // Eliminar todas las relaciones gusto-mascota asociadas
+
+        // Ahora eliminamos la mascota de la tabla mascota
         mascotaRepository.deleteById(id);
     }
+
     
     public List<MascotaEntity> ListarMascotasActivas() {
         return mascotaRepository.findByMascEstado(1);        
     }
 
-    // Filtros ***********************
+    // Filtros *****************************************************
     public List<MascotaEntity> filtrarPorSexo(Long sexId) {
         return mascotaRepository.findBySexo(sexId);
     }
@@ -100,10 +107,11 @@ public class MascotaService {
     public List<MascotaEntity> filtrarPorTipoMascota(Long tipmaId) {
         return mascotaRepository.findByTipoMascota(tipmaId);
     }
+    // *************************************************************
 
     // Método para filtrar con múltiples parámetros opcionales
-
     public List<MascotaEntity> filtrarPorFiltros(Long sexId, Long tamId, Long nienId, Long tipmaId) {
         return mascotaRepository.findByFilters(sexId, tamId, nienId, tipmaId);
     }
+    // *************************************************************
 }

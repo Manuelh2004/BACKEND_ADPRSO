@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,6 +56,23 @@ public class EventoController {
         return ResponseEntity.status(201).body(
             new ApiResponse<>("success", 201, creado, "Evento creado exitosamente")
         );
+    }
+
+     @PutMapping("/{id}") // El endpoint PUT para actualizar
+    public ResponseEntity<ApiResponse<EventoEntity>> actualizarEvento(
+        @PathVariable Long id, 
+        @RequestBody EventoEntity eventoActualizado) {
+        EventoEntity evento = eventoService.ActualizarEvento(id, eventoActualizado);
+        
+        if (evento != null) {
+            return ResponseEntity.ok(
+                new ApiResponse<>("success", 200, evento, "Evento actualizado exitosamente")
+            );
+        } else {
+            return ResponseEntity.status(404).body(
+                new ApiResponse<>("error", 404, null, "Evento no encontrado")
+            );
+        }
     }
 
     @DeleteMapping("/{id}")
