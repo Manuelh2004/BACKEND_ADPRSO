@@ -1,5 +1,7 @@
 package backend.backend_adprso.Entity.Items;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import backend.backend_adprso.Entity.Mascota.MascotaEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,5 +25,6 @@ public class ImagenEntity {
 
     @ManyToOne
     @JoinColumn(name = "masc_id", nullable = false)
+    @JsonBackReference
     private MascotaEntity mascota;
 }

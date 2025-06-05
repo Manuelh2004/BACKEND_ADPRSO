@@ -2,7 +2,6 @@ package backend.backend_adprso.Repository;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -47,5 +46,8 @@ public interface MascotaRepository extends JpaRepository<MascotaEntity, Long> {
            "LEFT JOIN FETCH m.gustoMascotaList gm " +
            "LEFT JOIN FETCH gm.gust_id g")
     List<MascotaEntity> findAllWithGustos();
+
+   @Query("SELECT m FROM MascotaEntity m LEFT JOIN m.imagenes i WHERE m.masc_id = :mascotaId")
+    List<MascotaEntity> findMascotaWithImagenes(@Param("mascotaId") Long mascotaId);
                                  
 }

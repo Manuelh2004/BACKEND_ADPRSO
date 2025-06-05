@@ -15,6 +15,9 @@ import backend.backend_adprso.Service.QRCodeService;
 
 @RestController
 public class PagoController {
+
+    // FALTA *********************************************
+
     @Autowired
     private QRCodeService qrCodeService;
 

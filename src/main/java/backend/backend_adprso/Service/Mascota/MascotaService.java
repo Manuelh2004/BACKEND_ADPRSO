@@ -12,6 +12,7 @@ import backend.backend_adprso.Entity.Items.GustoEntity;
 import backend.backend_adprso.Entity.Items.ImagenEntity;
 import backend.backend_adprso.Entity.Mascota.GustoMascotaEntity;
 import backend.backend_adprso.Entity.Mascota.MascotaEntity;
+import backend.backend_adprso.Entity.Mascota.MascotaImagenDTO;
 import backend.backend_adprso.Repository.GustoMascotaRepository;
 import backend.backend_adprso.Repository.GustoRepository;
 import backend.backend_adprso.Repository.ImagenRepository;
@@ -31,18 +32,18 @@ public class MascotaService {
 
     @Transactional
     public List<MascotaEntity> listarMascotas() {
-        return mascotaRepository.findAllWithGustos();       
-       
+        return mascotaRepository.findAll();       
     }
 
     @Transactional
     public Optional<MascotaEntity> ObtenerMascotaPorId(Long id) {
-        Optional<MascotaEntity> mascotaOpt = mascotaRepository.findById(id);
+       Optional<MascotaEntity> mascotaOpt = mascotaRepository.findById(id);
         if (mascotaOpt.isPresent()) {
-            // Asegúrate de que los gustos se carguen correctamente
             MascotaEntity mascota = mascotaOpt.get();
-            // Aquí se asegura que los gustos estén inicializados
-            mascota.getGustoNames(); // Forza la carga de los gustos asociados a la mascota
+            // Forzamos la carga de los gustos y las imágenes
+            mascota.getGustoNames();  // Carga los gustos asociados
+            List<ImagenEntity> imagenes = imagenRepository.findByMascotaId(id);  // Carga las imágenes
+            mascota.setImagenes(imagenes);  // Asocia las imágenes a la mascota
             return Optional.of(mascota);
         }
         return Optional.empty();
@@ -69,7 +70,6 @@ public class MascotaService {
         // Guardar todas las relaciones
         gustoMascotaRepository.saveAll(gustosMascota);
 
-
         // Guardar las imágenes relacionadas con la mascota
         if (imagenUrls != null && !imagenUrls.isEmpty()) {
             List<ImagenEntity> imagenes = imagenUrls.stream().map(imagenUrl -> {
@@ -85,18 +85,18 @@ public class MascotaService {
 
         return mascotaGuardada;
     }
-    
 
-   @Transactional
-    public void EliminarMascota(Long id) {
-        // Primero, eliminamos las relaciones en la tabla gusto_mascota
-        List<GustoMascotaEntity> gustoMascotas = gustoMascotaRepository.findByMascotaId(id);
-        gustoMascotaRepository.deleteAll(gustoMascotas); // Eliminar todas las relaciones gusto-mascota asociadas
-
-        // Ahora eliminamos la mascota de la tabla mascota
-        mascotaRepository.deleteById(id);
+    public List<MascotaImagenDTO> listarMascotasCards() {
+        List<MascotaEntity> mascotas = mascotaRepository.findAll(); 
+        
+        return mascotas.stream().map(mascota -> {          
+            List<String> imagenUrls = mascota.getImagenes().stream()
+                                            .map(ImagenEntity::getIma_url)
+                                            .limit(2)  // Solo las primeras dos imágenes
+                                            .collect(Collectors.toList());
+            return new MascotaImagenDTO(mascota.getMasc_id(), mascota.getMasc_nombre(), imagenUrls);
+        }).collect(Collectors.toList());
     }
-
     
     public List<MascotaEntity> ListarMascotasActivas() {
         return mascotaRepository.findByMascEstado(1);        
@@ -120,7 +120,7 @@ public class MascotaService {
     }
     // *************************************************************
 
-    // Método para filtrar con múltiples parámetros opcionales
+    // Filtros múltiples con parámetros opcionales
     public List<MascotaEntity> filtrarPorFiltros(Long sexId, Long tamId, Long nienId, Long tipmaId) {
         return mascotaRepository.findByFilters(sexId, tamId, nienId, tipmaId);
     }

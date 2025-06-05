@@ -8,6 +8,5 @@ import lombok.Data;
 public class MascotaConGustosDTO {
     private MascotaEntity mascota;
     private List<Long> gustosIds;
-    private List<String> imagenUrls; // Lista de URLs de imágenes
-
+    private List<String> imagenUrls;
 }

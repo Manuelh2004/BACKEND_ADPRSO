@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import backend.backend_adprso.Controller.Response.ApiResponse;
 import backend.backend_adprso.Entity.Mascota.MascotaConGustosDTO;
 import backend.backend_adprso.Entity.Mascota.MascotaEntity;
+import backend.backend_adprso.Entity.Mascota.MascotaImagenDTO;
 import backend.backend_adprso.Service.Mascota.MascotaService;
 
 @RestController
@@ -52,21 +52,7 @@ public class MascotaController {
 
         ApiResponse<MascotaEntity> response = new ApiResponse<>("success", 201, mascotaGuardada, "Mascota registrada correctamente con gustos e imágenes");
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> eliminarMascota(@PathVariable Long id) {
-        Optional<MascotaEntity> mascotaOpt = mascotaService.ObtenerMascotaPorId(id);
-        if (mascotaOpt.isPresent()) {
-            mascotaService.EliminarMascota(id);
-            ApiResponse<Void> response = new ApiResponse<>("success", 200, null, "Mascota eliminada correctamente");
-            return ResponseEntity.ok(response);
-        } else {
-            ApiResponse<Void> response = new ApiResponse<>("error", 404, null, "Mascota no encontrada");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
-    }
+    }   
 
     @GetMapping("/filter")
     public ResponseEntity<List<MascotaEntity>> filtrarMascotas(
@@ -78,4 +64,13 @@ public class MascotaController {
         List<MascotaEntity> resultados = mascotaService.filtrarPorFiltros(sexId, tamId, nienId, tipmaId);
         return ResponseEntity.ok(resultados);
     }
+
+    // Endpoint para obtener solo el nombre de la mascota y las imágenes asociadas
+   @GetMapping("/cards")
+     public ResponseEntity<ApiResponse<List<MascotaImagenDTO>>> listarMascotasCards() {
+        List<MascotaImagenDTO> mascotasConImagenes = mascotaService.listarMascotasCards();
+        ApiResponse<List<MascotaImagenDTO>> response = new ApiResponse<>("success", 200, mascotasConImagenes, "Todas las mascotas con imágenes");
+        return ResponseEntity.ok(response);
+    }
+
 }

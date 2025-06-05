@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import backend.backend_adprso.Entity.Items.EstadoSaludEntity;
 import backend.backend_adprso.Entity.Items.EstadoVacunaEntity;
+import backend.backend_adprso.Entity.Items.ImagenEntity;
 import backend.backend_adprso.Entity.Items.NivelEnergiaEntity;
 import backend.backend_adprso.Entity.Items.SexoEntity;
 import backend.backend_adprso.Entity.Items.TamanioEntity;
@@ -66,11 +66,13 @@ public class MascotaEntity {
     private EstadoVacunaEntity estado_vacuna;
 
     @OneToMany(mappedBy = "masc_id")
-    @JsonManagedReference
+    @JsonIgnore
     private List<GustoMascotaEntity> gustoMascotaList;
 
-    // Método que devuelve solo los nombres de los gustos
-     public List<Map<String, Object>> getGustoNames() {
+    @OneToMany(mappedBy = "mascota")
+    private List<ImagenEntity> imagenes;
+
+    public List<Map<String, Object>> getGustoNames() {
         List<Map<String, Object>> gustoInfoList = new ArrayList<>();
         if (gustoMascotaList != null) {
             for (GustoMascotaEntity gustoMascota : gustoMascotaList) {
