@@ -87,7 +87,7 @@ public class MascotaService {
     }
 
     public List<MascotaImagenDTO> listarMascotasCards() {
-        List<MascotaEntity> mascotas = mascotaRepository.findAll(); 
+        List<MascotaEntity> mascotas = mascotaRepository.findByMascEstado(1); 
         
         return mascotas.stream().map(mascota -> {          
             List<String> imagenUrls = mascota.getImagenes().stream()
@@ -101,7 +101,31 @@ public class MascotaService {
     public List<MascotaEntity> ListarMascotasActivas() {
         return mascotaRepository.findByMascEstado(1);        
     }
+   
+    @Transactional
+    public Optional<MascotaEntity> actualizarMascota(Long id, MascotaEntity mascotaActualizada, List<Long> nuevosGustosIds, List<String> nuevasImagenUrls) {
+        Optional<MascotaEntity> mascotaOpt = mascotaRepository.findById(id);
+        if (mascotaOpt.isPresent()) {
+            MascotaEntity mascotaExistente = mascotaOpt.get();
+            
+            mascotaExistente.setMasc_nombre(mascotaActualizada.getMasc_nombre());
+            mascotaExistente.setMasc_fecha_nacimiento(mascotaActualizada.getMasc_fecha_nacimiento());
+            mascotaExistente.setMasc_historia(mascotaActualizada.getMasc_historia());
+            mascotaExistente.setMasc_observacion(mascotaActualizada.getMasc_observacion());
+            mascotaExistente.setMasc_estado(mascotaActualizada.getMasc_estado());
+            mascotaExistente.setSexo(mascotaActualizada.getSexo());
+            mascotaExistente.setTamanio(mascotaActualizada.getTamanio());
+            mascotaExistente.setNivel_energia(mascotaActualizada.getNivel_energia());
+            mascotaExistente.setTipo_mascota(mascotaActualizada.getTipo_mascota());
+            mascotaExistente.setEstado_salud(mascotaActualizada.getEstado_salud());
+            mascotaExistente.setEstado_vacuna(mascotaActualizada.getEstado_vacuna());
+         
+            MascotaEntity mascotaGuardada = mascotaRepository.save(mascotaExistente);          
 
+            return Optional.of(mascotaGuardada);
+        }
+        return Optional.empty();
+    }
     // Filtros *****************************************************
     public List<MascotaEntity> filtrarPorSexo(Long sexId) {
         return mascotaRepository.findBySexo(sexId);
