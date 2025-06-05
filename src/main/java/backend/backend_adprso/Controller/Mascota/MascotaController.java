@@ -28,7 +28,7 @@ public class MascotaController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<MascotaEntity>>> listarMascotas() {
-        List<MascotaEntity> mascotas = mascotaService.ListarMascotas();
+        List<MascotaEntity> mascotas = mascotaService.listarMascotas();
         ApiResponse<List<MascotaEntity>> response = new ApiResponse<>("success", 200, mascotas, "Lista de mascotas");
         return ResponseEntity.ok(response);
     }

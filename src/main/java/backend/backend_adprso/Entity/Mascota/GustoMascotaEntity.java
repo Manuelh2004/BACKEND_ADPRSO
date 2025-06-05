@@ -1,5 +1,7 @@
 package backend.backend_adprso.Entity.Mascota;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import backend.backend_adprso.Entity.Items.GustoEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,12 +23,14 @@ public class GustoMascotaEntity {
     @Column(name = "gumasc_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "masc_id", nullable = false)
+    @JsonBackReference
     private MascotaEntity masc_id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "gust_id", nullable = false)
+    @JsonBackReference
     private GustoEntity gust_id;
 
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import backend.backend_adprso.Entity.Evento.EventoEntity;
 import backend.backend_adprso.Repository.EventoRepository;
+import jakarta.transaction.Transactional;
 
 @Service
 public class EventoService {
@@ -22,13 +23,22 @@ public class EventoService {
         return eventoRepository.findById(id);
     }
 
+    @Transactional
+    public EventoEntity cambiarEstadoEvento(Long evenId, Integer nuevoEstado) {
+        Optional<EventoEntity> eventoExistente = eventoRepository.findById(evenId);
+        
+        if (eventoExistente.isPresent()) {
+            EventoEntity evento = eventoExistente.get();
+            evento.setEven_estado(nuevoEstado);
+            return eventoRepository.save(evento);
+        } else {
+            return null; // Si el evento no existe, retorna null
+        }
+    }
+
     public EventoEntity RegistrarEvento(EventoEntity evento) {
         evento.setEven_estado(1);
         return eventoRepository.save(evento);
-    }
-
-    public void EliminarEvento(Long id) {
-        eventoRepository.deleteById(id);
     }
 
     public List<EventoEntity> ListarEventosActivos() {

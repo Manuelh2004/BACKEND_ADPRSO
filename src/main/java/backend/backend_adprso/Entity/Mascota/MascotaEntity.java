@@ -1,6 +1,13 @@
 package backend.backend_adprso.Entity.Mascota;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import backend.backend_adprso.Entity.Items.EstadoSaludEntity;
 import backend.backend_adprso.Entity.Items.EstadoVacunaEntity;
@@ -15,6 +22,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -56,4 +64,25 @@ public class MascotaEntity {
     @ManyToOne
     @JoinColumn(name = "estva_id", nullable = false)
     private EstadoVacunaEntity estado_vacuna;
+
+    @OneToMany(mappedBy = "masc_id")
+    @JsonManagedReference
+    private List<GustoMascotaEntity> gustoMascotaList;
+
+    // Método que devuelve solo los nombres de los gustos
+     public List<Map<String, Object>> getGustoNames() {
+        List<Map<String, Object>> gustoInfoList = new ArrayList<>();
+        if (gustoMascotaList != null) {
+            for (GustoMascotaEntity gustoMascota : gustoMascotaList) {
+                if (gustoMascota.getGust_id() != null) {
+                    // Creamos un mapa con el id y nombre del gusto
+                    Map<String, Object> gustoMap = new HashMap<>();
+                    gustoMap.put("id", gustoMascota.getGust_id().getGust_id());
+                    gustoMap.put("nombre", gustoMascota.getGust_id().getGust_nombre());
+                    gustoInfoList.add(gustoMap);
+                }
+            }
+        }
+        return gustoInfoList;
+    }
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import backend.backend_adprso.Controller.Response.ApiResponse;
@@ -58,7 +59,7 @@ public class EventoController {
         );
     }
 
-     @PutMapping("/{id}") // El endpoint PUT para actualizar
+     @PutMapping("/{id}") 
     public ResponseEntity<ApiResponse<EventoEntity>> actualizarEvento(
         @PathVariable Long id, 
         @RequestBody EventoEntity eventoActualizado) {
@@ -75,17 +76,21 @@ public class EventoController {
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> eliminarEvento(@PathVariable Long id) {
-        if (eventoService.ObtenerEventoPorId(id).isPresent()) {
-            eventoService.EliminarEvento(id);
+    @PutMapping("/{id}/estado")
+    public ResponseEntity<ApiResponse<EventoEntity>> cambiarEstado(
+        @PathVariable Long id, 
+        @RequestParam Integer nuevoEstado) {
+        
+        EventoEntity evento = eventoService.cambiarEstadoEvento(id, nuevoEstado);
+        
+        if (evento != null) {
             return ResponseEntity.ok(
-                new ApiResponse<>("success", 200, null, "Evento eliminado correctamente")
+                new ApiResponse<>("success", 200, evento, "Estado del evento actualizado exitosamente")
             );
         } else {
             return ResponseEntity.status(404).body(
                 new ApiResponse<>("error", 404, null, "Evento no encontrado")
             );
         }
-    }
+    }    
 }

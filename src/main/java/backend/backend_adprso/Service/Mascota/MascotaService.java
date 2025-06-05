@@ -29,12 +29,23 @@ public class MascotaService {
     @Autowired
     ImagenRepository imagenRepository;
 
-    public List<MascotaEntity> ListarMascotas() {
-        return mascotaRepository.findAll();
+    @Transactional
+    public List<MascotaEntity> listarMascotas() {
+        return mascotaRepository.findAllWithGustos();       
+       
     }
 
+    @Transactional
     public Optional<MascotaEntity> ObtenerMascotaPorId(Long id) {
-        return mascotaRepository.findById(id);
+        Optional<MascotaEntity> mascotaOpt = mascotaRepository.findById(id);
+        if (mascotaOpt.isPresent()) {
+            // Asegúrate de que los gustos se carguen correctamente
+            MascotaEntity mascota = mascotaOpt.get();
+            // Aquí se asegura que los gustos estén inicializados
+            mascota.getGustoNames(); // Forza la carga de los gustos asociados a la mascota
+            return Optional.of(mascota);
+        }
+        return Optional.empty();
     }
     
     @Transactional
