@@ -44,8 +44,9 @@ public class UsuarioEntity {
     private boolean admin;  
     
     @ManyToOne
-    @JoinColumn(name = "tipdoc_id", nullable = false)
+    @JoinColumn(name = "tipdoc_id" ,nullable = false)
     private TipoDocumentoEntity tipoDocumento;
+    
     @ManyToOne
     @JoinColumn(name = "tipus_id", nullable = false)
     private TipoUsuarioEntity tipoUsuario;
