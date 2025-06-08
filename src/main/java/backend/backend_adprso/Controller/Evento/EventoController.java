@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import backend.backend_adprso.Controller.Response.ApiResponse;
 import backend.backend_adprso.Entity.Evento.EventoEntity;
+import backend.backend_adprso.Entity.Evento.EventoUsuarioEntity;
 import backend.backend_adprso.Service.Evento.EventoService;
 
 @RestController
@@ -92,4 +93,24 @@ public class EventoController {
             );
         }
     }    
+
+    /*********************************************************************************************** */
+
+    @PostMapping("/asignar_usuario")
+    public ResponseEntity<ApiResponse<EventoUsuarioEntity>> registrarEventoUsuario(
+            @RequestParam Long eventoId, 
+            @RequestParam Long usuarioId) {
+
+        try {
+            // Registrar el evento-usuario y obtener la relación
+            EventoUsuarioEntity eventoUsuario = eventoService.registrarEventoUsuario(eventoId, usuarioId);
+            return ResponseEntity.ok(
+                new ApiResponse<>("success", 200, eventoUsuario, "Evento y Usuario registrados exitosamente.")
+            );
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(400).body(
+                new ApiResponse<>("error", 400, null, e.getMessage())
+            );
+        }
+    }
 }
