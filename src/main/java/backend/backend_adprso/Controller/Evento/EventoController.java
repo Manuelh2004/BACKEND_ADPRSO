@@ -19,12 +19,12 @@ import backend.backend_adprso.Entity.Evento.EventoUsuarioEntity;
 import backend.backend_adprso.Service.Evento.EventoService;
 
 @RestController
-@RequestMapping("/evento")
+@RequestMapping("/api/evento")
 public class EventoController {
     @Autowired
     EventoService eventoService;
 
-    @GetMapping
+    @GetMapping("/listar/user")
     public ResponseEntity<ApiResponse<List<EventoEntity>>> listarEventos() {
         List<EventoEntity> eventos = eventoService.ListarEventos();
         return ResponseEntity.ok(
@@ -51,7 +51,7 @@ public class EventoController {
             ));
     }
 
-    @PostMapping
+    @PostMapping("/admin")
     public ResponseEntity<ApiResponse<EventoEntity>> registrarEvento(@RequestBody EventoEntity evento) {
         EventoEntity creado = eventoService.RegistrarEvento(evento);
         return ResponseEntity.status(201).body(

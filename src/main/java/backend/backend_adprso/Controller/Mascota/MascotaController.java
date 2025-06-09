@@ -22,7 +22,7 @@ import backend.backend_adprso.Entity.Mascota.MascotaImagenDTO;
 import backend.backend_adprso.Service.Mascota.MascotaService;
 
 @RestController
-@RequestMapping("/mascota")
+@RequestMapping("/user/mascota")
 public class MascotaController {
     
     @Autowired
