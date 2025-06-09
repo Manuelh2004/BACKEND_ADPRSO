@@ -20,7 +20,7 @@ import backend.backend_adprso.Entity.Items.TipoUsuarioEntity;
 import backend.backend_adprso.Service.Items.ItemService;
 
 @RestController
-@RequestMapping("/user/item")
+@RequestMapping("/api/item")
 public class ItemController {
     @Autowired
     ItemService itemService; 

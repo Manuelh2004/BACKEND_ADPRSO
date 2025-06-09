@@ -27,19 +27,16 @@ public class SecurityConfig {
 
     @Bean
     public EndsWithUserRequestMatcher endsWithUserRequestMatcher() {
-        return new EndsWithUserRequestMatcher(); // Crear una instancia de EndsWithUserRequestMatcher manualmente
+        return new EndsWithUserRequestMatcher(); 
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(request -> endsWithUserRequestMatcher().matches((HttpServletRequest) request)) // Usar EndsWithUserRequestMatcher para rutas que terminan con "/user"
+                .requestMatchers(request -> endsWithUserRequestMatcher().matches((HttpServletRequest) request))
                 .permitAll()  // Permitir acceso a esas rutas
-
-                // También permitir las rutas que comienzan con "/auth/"
                 .requestMatchers("/auth/**").permitAll()
-
                 .anyRequest().authenticated()  // Requiere autenticación para cualquier otra ruta
             )
             .exceptionHandling(ex -> ex
@@ -47,10 +44,8 @@ public class SecurityConfig {
                 .accessDeniedHandler(jwtAccessDeniedHandler)
             )
             .sessionManagement(sess -> sess
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // Usamos Stateless porque estamos trabajando con JWT
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             );
-
-        // Añadimos el filtro JWT antes del filtro de autenticación por usuario y contraseña
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

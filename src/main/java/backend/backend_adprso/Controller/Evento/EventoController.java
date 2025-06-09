@@ -24,7 +24,7 @@ public class EventoController {
     @Autowired
     EventoService eventoService;
 
-    @GetMapping("/listar/user")
+    @GetMapping("/listar")
     public ResponseEntity<ApiResponse<List<EventoEntity>>> listarEventos() {
         List<EventoEntity> eventos = eventoService.ListarEventos();
         return ResponseEntity.ok(
@@ -32,7 +32,7 @@ public class EventoController {
         );
     }
 
-   @GetMapping("/activos")
+   @GetMapping("/activos/public")
     public ResponseEntity<ApiResponse<List<EventoEntity>>> listarEventosActivos() {
         List<EventoEntity> eventos = eventoService.ListarEventosActivos();
         return ResponseEntity.ok(
@@ -40,7 +40,7 @@ public class EventoController {
         );
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/public")
     public ResponseEntity<ApiResponse<EventoEntity>> obtenerEventoPorId(@PathVariable Long id) {
         return eventoService.ObtenerEventoPorId(id)
             .map(evento -> ResponseEntity.ok(
@@ -51,7 +51,7 @@ public class EventoController {
             ));
     }
 
-    @PostMapping("/admin")
+    @PostMapping("/registrar_evento")
     public ResponseEntity<ApiResponse<EventoEntity>> registrarEvento(@RequestBody EventoEntity evento) {
         EventoEntity creado = eventoService.RegistrarEvento(evento);
         return ResponseEntity.status(201).body(

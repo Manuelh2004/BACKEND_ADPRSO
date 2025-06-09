@@ -22,20 +22,20 @@ import backend.backend_adprso.Entity.Mascota.MascotaImagenDTO;
 import backend.backend_adprso.Service.Mascota.MascotaService;
 
 @RestController
-@RequestMapping("/user/mascota")
+@RequestMapping("/api/mascota")
 public class MascotaController {
     
     @Autowired
     private MascotaService mascotaService; 
 
-    @GetMapping
+    @GetMapping("/listar_mascota")
     public ResponseEntity<ApiResponse<List<MascotaEntity>>> listarMascotas() {
         List<MascotaEntity> mascotas = mascotaService.listarMascotas();
         ApiResponse<List<MascotaEntity>> response = new ApiResponse<>("success", 200, mascotas, "Lista de mascotas");
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/public")
     public ResponseEntity<ApiResponse<MascotaEntity>> obtenerMascotaPorId(@PathVariable Long id) {
         Optional<MascotaEntity> mascotaOpt = mascotaService.ObtenerMascotaPorId(id);
         if (mascotaOpt.isPresent()) {
@@ -47,7 +47,7 @@ public class MascotaController {
         }
     }
 
-    @PostMapping
+    @PostMapping("registrar_mascota")
     public ResponseEntity<ApiResponse<MascotaEntity>> registrarMascota(@RequestBody MascotaConGustosDTO request) {
         // Llamamos al servicio pasando las URLs de las imágenes también
         MascotaEntity mascotaGuardada = mascotaService.RegistrarMascota(request.getMascota(), request.getGustosIds(), request.getImagenUrls());
@@ -56,7 +56,7 @@ public class MascotaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/filter")
+    @GetMapping("/filter/public")
     public ResponseEntity<List<MascotaEntity>> filtrarMascotas(
         @RequestParam(required = false) Long sexId,
         @RequestParam(required = false) Long tamId,
@@ -68,7 +68,7 @@ public class MascotaController {
     }
 
     // Endpoint para obtener solo el nombre de la mascota y las imágenes asociadas
-    @GetMapping("/cards")
+    @GetMapping("/cards/public")
     public ResponseEntity<ApiResponse<List<MascotaImagenDTO>>> listarMascotasCards() {
         List<MascotaImagenDTO> mascotasConImagenes = mascotaService.listarMascotasCards();
         ApiResponse<List<MascotaImagenDTO>> response = new ApiResponse<>("success", 200, mascotasConImagenes, "Todas las mascotas con imágenes");
