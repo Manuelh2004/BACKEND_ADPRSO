@@ -39,7 +39,8 @@ public class AuthService {
             throw new RuntimeException("El correo electrónico ya está registrado.");
         }
 
-        TipoUsuarioEntity tipoUsuario = tipoUsuarioRepository.findById(2L).orElseThrow(() -> new RuntimeException("Tipo de usuario no encontrado"));      
+        TipoUsuarioEntity tipoUsuario = tipoUsuarioRepository.findById(2L)
+            .orElseThrow(() -> new RuntimeException("Tipo de usuario no encontrado"));      
 
         usuario.setTipoUsuario(tipoUsuario);
 
@@ -49,16 +50,20 @@ public class AuthService {
 
         usuarioRepository.save(usuario);
 
+        // Generar el token JWT después de registrar al usuario
+        String token = jwtUtil.generateToken(usuario.getUsr_email());
+
         // Enviar correo de bienvenida
         try {
             String subject = "¡Bienvenido al Sistema!";
             String body = "<h1>¡Bienvenido, " + usuario.getUsr_email() + "!</h1>" +
-                          "<p>Gracias por registrarte en nuestro sistema. Estamos felices de tenerte como parte de nuestra comunidad.</p>";
+                          "<p>Gracias por registrarte en nuestro sistema. Estamos felices de tenerte como parte de nuestra comunidad.</p>" +
+                          "<p>Tu token de acceso es: " + token + "</p>";  // Incluir el token en el correo de bienvenida
             emailService.sendEmail(usuario.getUsr_email(), subject, body);
         } catch (MessagingException e) {
             throw new RuntimeException("Error al enviar el correo electrónico de bienvenida", e);
         }
 
-        return "Usuario registrado exitosamente!";
+        return token;  // Devolvemos el token
     }
 }

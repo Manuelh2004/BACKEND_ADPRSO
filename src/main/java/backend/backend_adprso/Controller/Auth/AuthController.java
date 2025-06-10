@@ -1,5 +1,7 @@
 package backend.backend_adprso.Controller.Auth;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,14 +38,19 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<ApiResponse<UsuarioEntity>> register(@RequestBody UsuarioEntity usuario) {
+      @PostMapping("/register")
+    public ResponseEntity<ApiResponse<?>> register(@RequestBody UsuarioEntity usuario) {
         try {
-            // Llamamos al servicio para registrar el usuario
-            authService.register(usuario);  // Aquí el usuario ya se registró correctamente
+            // Llamamos al servicio para registrar el usuario y obtener el token
+            String token = authService.register(usuario);  // Ahora también obtenemos el token
 
-            // Al registrar el usuario, devolvemos el objeto completo del usuario
-            ApiResponse<UsuarioEntity> response = new ApiResponse<>("success", HttpStatus.CREATED.value(), usuario, "Usuario registrado exitosamente");
+            // Creamos la respuesta con el usuario y el token
+            ApiResponse<Map <String, Object>> response = new ApiResponse<>(
+                "success",
+                HttpStatus.CREATED.value(),
+                Map.of("usuario", usuario, "token", token),  // Incluimos tanto el usuario como el token
+                "Usuario registrado exitosamente"
+            );
 
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (RuntimeException e) {
