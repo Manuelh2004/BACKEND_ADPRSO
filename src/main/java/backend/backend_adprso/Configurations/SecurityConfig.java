@@ -30,24 +30,25 @@ public class SecurityConfig {
         return new EndsWithUserRequestMatcher(); 
     }
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(request -> endsWithUserRequestMatcher().matches((HttpServletRequest) request))
-                .permitAll()  // Permitir acceso a esas rutas
-                .requestMatchers("/auth/**").permitAll()
-                .anyRequest().authenticated()  // Requiere autenticación para cualquier otra ruta
-            )
-            .exceptionHandling(ex -> ex
-                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                .accessDeniedHandler(jwtAccessDeniedHandler)
-            )
-            .sessionManagement(sess -> sess
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            );
-        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+   @Bean
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http.csrf(csrf -> csrf.disable()) // Desactivar CSRF porque estamos usando JWT
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/auth/**").permitAll() // Permitir acceso a rutas de autenticación
+            .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")  // Rutas /admin/** solo accesibles para los ADMIN
+            .requestMatchers("/user/**").hasAuthority("ROLE_USER")  // Rutas /user/** solo accesibles para los USER
+            .anyRequest().authenticated() // Requiere autenticación para cualquier otra ruta
+        )
+        .exceptionHandling(ex -> ex
+            .authenticationEntryPoint(jwtAuthenticationEntryPoint) // Manejo de errores de autenticación
+            .accessDeniedHandler(jwtAccessDeniedHandler) // Manejo de errores de acceso denegado
+        )
+        .sessionManagement(sess -> sess
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // No usar sesiones
+        );
 
-        return http.build();
-    }
+    http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);  // Asegurar que el filtro JWT se ejecute antes
+
+    return http.build();
+}
 }

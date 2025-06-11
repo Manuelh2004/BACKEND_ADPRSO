@@ -26,22 +26,25 @@ public class AuthService {
     public String login(String email, String password) {
         Optional<UsuarioEntity> usuario = usuarioRepository.findByUsrEmail(email);
         if (usuario.isPresent() && usuario.get().getUsr_password().equals(password)) {
-            return jwtUtil.generateToken(email);
+            // Obtener el rol del usuario
+            String role = usuario.get().getTipoUsuario().getTipus_nombre();  // Esto te dará ROL_ADMIN o ROL_USER
+            return jwtUtil.generateToken(email, role);
         } else {
             throw new RuntimeException("Credenciales inválidas");
         }
     }
 
- public String register(UsuarioEntity usuario) {
+
+    public String register(UsuarioEntity usuario) {
         // Verificar si el usuario ya existe
         Optional<UsuarioEntity> existingUser = usuarioRepository.findByUsrEmail(usuario.getUsr_email());
         if (existingUser.isPresent()) {
             throw new RuntimeException("El correo electrónico ya está registrado.");
         }
 
+        // Obtener el tipo de usuario y asignarlo
         TipoUsuarioEntity tipoUsuario = tipoUsuarioRepository.findById(2L)
-            .orElseThrow(() -> new RuntimeException("Tipo de usuario no encontrado"));      
-
+            .orElseThrow(() -> new RuntimeException("Tipo de usuario no encontrado"));
         usuario.setTipoUsuario(tipoUsuario);
 
         if (usuario.getUsr_email() == null) {
@@ -50,15 +53,18 @@ public class AuthService {
 
         usuarioRepository.save(usuario);
 
-        // Generar el token JWT después de registrar al usuario
-        String token = jwtUtil.generateToken(usuario.getUsr_email());
+        // Obtener el rol del nuevo usuario
+        String role = usuario.getTipoUsuario().getTipus_nombre(); // Esto te dará ROL_ADMIN o ROL_USER
+
+        // Generar el token JWT después de registrar al usuario, pasando el rol
+        String token = jwtUtil.generateToken(usuario.getUsr_email(), role);
 
         // Enviar correo de bienvenida
         try {
             String subject = "¡Bienvenido al Sistema!";
             String body = "<h1>¡Bienvenido, " + usuario.getUsr_email() + "!</h1>" +
-                          "<p>Gracias por registrarte en nuestro sistema. Estamos felices de tenerte como parte de nuestra comunidad.</p>" +
-                          "<p>Tu token de acceso es: " + token + "</p>";  // Incluir el token en el correo de bienvenida
+                        "<p>Gracias por registrarte en nuestro sistema. Estamos felices de tenerte como parte de nuestra comunidad.</p>" +
+                        "<p>Tu token de acceso es: " + token + "</p>";  // Incluir el token en el correo de bienvenida
             emailService.sendEmail(usuario.getUsr_email(), subject, body);
         } catch (MessagingException e) {
             throw new RuntimeException("Error al enviar el correo electrónico de bienvenida", e);
@@ -66,4 +72,5 @@ public class AuthService {
 
         return token;  // Devolvemos el token
     }
+
 }

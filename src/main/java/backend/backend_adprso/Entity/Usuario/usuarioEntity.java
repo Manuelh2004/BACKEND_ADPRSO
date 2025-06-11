@@ -49,4 +49,9 @@ public class UsuarioEntity {
     @ManyToOne
     @JoinColumn(name = "tipus_id", nullable = false)
     private TipoUsuarioEntity tipoUsuario;
+
+    // Método para obtener el rol del tipoUsuario
+    public String getRol() {
+        return tipoUsuario != null ? tipoUsuario.getTipus_nombre() : null; // ROL_ADMIN o ROL_USER
+    }
 }
