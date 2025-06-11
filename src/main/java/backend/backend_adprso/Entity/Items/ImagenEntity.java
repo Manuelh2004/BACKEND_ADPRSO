@@ -1,8 +1,8 @@
-package backend.backend_adprso.Entity.Mascota;
+package backend.backend_adprso.Entity.Items;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
-import backend.backend_adprso.Entity.Items.GustoEntity;
+import backend.backend_adprso.Entity.Mascota.MascotaEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,21 +15,16 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "gusto_mascota")
-public class GustoMascotaEntity {
+@Table(name = "imagen")
+public class ImagenEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "gumasc_id")
-    private Long id;
+    private Long ima_id; 
+    @Column
+    private String ima_url;
 
     @ManyToOne
     @JoinColumn(name = "masc_id", nullable = false)
     @JsonBackReference
-    private MascotaEntity masc_id;
-
-    @ManyToOne
-    @JoinColumn(name = "gust_id", nullable = false)
-    @JsonBackReference
-    private GustoEntity gust_id;
-
+    private MascotaEntity mascota;
 }

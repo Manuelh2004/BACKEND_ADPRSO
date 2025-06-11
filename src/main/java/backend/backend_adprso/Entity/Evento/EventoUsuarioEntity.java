@@ -1,10 +1,6 @@
-package backend.backend_adprso.Entity.Adopcion;
+package backend.backend_adprso.Entity.Evento;
 
-import java.time.LocalDate;
-
-import backend.backend_adprso.Entity.Mascota.MascotaEntity;
 import backend.backend_adprso.Entity.Usuario.UsuarioEntity;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,21 +12,14 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "adopcion")
-public class AdopcionEntity {
-     @Id
+@Table(name = "evento_usuario")
+public class EventoUsuarioEntity {
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long adop_id; 
-    @Column(nullable = false)
-    private String adop_motivo;
-    @Column
-    private LocalDate adop_fecha;
-    @Column
-    private Integer adop_estado;
-
+    private Long evein_id; 
     @ManyToOne
-    @JoinColumn(name = "masc_id", nullable = false)
-    private MascotaEntity mascota;
+    @JoinColumn(name = "even_id", nullable = false)
+    private EventoEntity evento;
     @ManyToOne
     @JoinColumn(name = "usr_id", nullable = false)
     private UsuarioEntity usuario;

@@ -10,11 +10,13 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "estado_salud")
-public class EstadoSaludEntity {
+@Table(name = "estado_vacuna") // Vacunas completa, imcompleta etc
+public class EstadoVacunaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long estsa_id; 
+    private Long estva_id; 
     @Column
-    private String estsa_nombre;
+    private String estva_nombre;
+    @Column
+    private String estva_descripcion;
 }
