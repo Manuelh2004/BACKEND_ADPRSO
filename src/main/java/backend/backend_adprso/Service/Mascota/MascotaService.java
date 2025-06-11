@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import backend.backend_adprso.Entity.Evento.EventoEntity;
 import backend.backend_adprso.Entity.Items.GustoEntity;
 import backend.backend_adprso.Entity.Items.ImagenEntity;
 import backend.backend_adprso.Entity.Mascota.GustoMascotaEntity;
@@ -54,10 +55,8 @@ public class MascotaService {
         mascota.setMasc_estado(1);
         mascota.setMasc_fecha_registro(LocalDate.now());
 
-        // Guardar la mascota primero para obtener el ID
         MascotaEntity mascotaGuardada = mascotaRepository.save(mascota);
 
-        // Crear relaciones gusto-mascota
         List<GustoEntity> gustos = gustoRepository.findAllById(gustosIds);
 
         List<GustoMascotaEntity> gustosMascota = gustos.stream().map(gusto -> {
@@ -67,19 +66,16 @@ public class MascotaService {
             return gm;
         }).collect(Collectors.toList());
 
-        // Guardar todas las relaciones
         gustoMascotaRepository.saveAll(gustosMascota);
 
-        // Guardar las imágenes relacionadas con la mascota
         if (imagenUrls != null && !imagenUrls.isEmpty()) {
             List<ImagenEntity> imagenes = imagenUrls.stream().map(imagenUrl -> {
                 ImagenEntity imagen = new ImagenEntity();
                 imagen.setIma_url(imagenUrl);
-                imagen.setMascota(mascotaGuardada); // Relacionamos con la mascota
+                imagen.setMascota(mascotaGuardada); 
                 return imagen;
             }).collect(Collectors.toList());
 
-            // Guardamos las imágenes en la base de datos
             imagenRepository.saveAll(imagenes);
         }
 
@@ -126,6 +122,20 @@ public class MascotaService {
         }
         return Optional.empty();
     }
+
+    @Transactional
+    public MascotaEntity cambiarEstadoMascota(Long evenId, Integer nuevoEstado) {
+        Optional<MascotaEntity> mascotaExistente = mascotaRepository.findById(evenId);
+        
+        if (mascotaExistente.isPresent()) {
+            MascotaEntity mascota = mascotaExistente.get();
+            mascota.setMasc_estado(nuevoEstado);
+            return mascotaRepository.save(mascota);
+        } else {
+            return null; // Si el evento no existe, retorna null
+        }
+    }
+
     // Filtros *****************************************************
     public List<MascotaEntity> filtrarPorSexo(Long sexId) {
         return mascotaRepository.findBySexo(sexId);

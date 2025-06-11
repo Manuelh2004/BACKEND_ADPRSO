@@ -15,13 +15,10 @@ import jakarta.servlet.http.HttpServletRequest;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
-
     @Autowired
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
     @Autowired
     private JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
@@ -30,25 +27,27 @@ public class SecurityConfig {
         return new EndsWithUserRequestMatcher(); 
     }
 
-   @Bean
-public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http.csrf(csrf -> csrf.disable()) // Desactivar CSRF porque estamos usando JWT
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/auth/**").permitAll() // Permitir acceso a rutas de autenticación
-            .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")  // Rutas /admin/** solo accesibles para los ADMIN
-            .requestMatchers("/user/**").hasAuthority("ROLE_USER")  // Rutas /user/** solo accesibles para los USER
-            .anyRequest().authenticated() // Requiere autenticación para cualquier otra ruta
-        )
-        .exceptionHandling(ex -> ex
-            .authenticationEntryPoint(jwtAuthenticationEntryPoint) // Manejo de errores de autenticación
-            .accessDeniedHandler(jwtAccessDeniedHandler) // Manejo de errores de acceso denegado
-        )
-        .sessionManagement(sess -> sess
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // No usar sesiones
-        );
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable()) 
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(request -> endsWithUserRequestMatcher().matches((HttpServletRequest) request)) // Usar EndsWithUserRequestMatcher para rutas que terminan con "/user"Add commentMore actions
+                .permitAll()  // Permitir acceso a esas rutas
+                .requestMatchers("/auth/**").permitAll() 
+                .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")  // Rutas /admin/** solo accesibles para los ADMIN
+                .requestMatchers("/user/**").hasAuthority("ROLE_USER")  // Rutas /user/** solo accesibles para los USER
+                .anyRequest().authenticated() // Requiere autenticación para cualquier otra ruta
+            )
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint) // Manejo de errores de autenticación
+                .accessDeniedHandler(jwtAccessDeniedHandler) // Manejo de errores de acceso denegado
+            )
+            .sessionManagement(sess -> sess
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) 
+            );
 
-    http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);  // Asegurar que el filtro JWT se ejecute antes
+        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);  
 
-    return http.build();
-}
+        return http.build();
+    }
 }

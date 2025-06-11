@@ -2,7 +2,6 @@ package backend.backend_adprso.Filter;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,8 +11,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import backend.backend_adprso.Entity.Usuario.UsuarioEntity;
-import backend.backend_adprso.Repository.UsuarioRepository;
 import backend.backend_adprso.Service.AuthService.JwtUtil;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
@@ -28,51 +25,47 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private JwtUtil jwtUtil;   
 
     @Override
-protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-        throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
 
-    final String authHeader = request.getHeader("Authorization");
-    System.out.println("Authorization header: " + authHeader);  // Imprime el encabezado Authorization
+        final String authHeader = request.getHeader("Authorization");
+        System.out.println("Authorization header: " + authHeader);  
 
-    String email = null;
-    String jwt = null;
-    String role = null;
+        String email = null;
+        String jwt = null;
+        String role = null;
 
-    if (authHeader != null && authHeader.startsWith("Bearer ")) {
-        jwt = authHeader.substring(7);
-        System.out.println("JWT token extraído: " + jwt);
-        try {
-            // Extraemos el email y el rol directamente del JWT
-            email = jwtUtil.extractUsername(jwt);
-            role = Jwts.parserBuilder()
-                       .setSigningKey(jwtUtil.getSigningKey())
-                       .build()
-                       .parseClaimsJws(jwt)
-                       .getBody()
-                       .get("role", String.class); // El rol está en el claim "role"
-            System.out.println("Email extraído del token: " + email);
-            System.out.println("Role extraído del token: " + role);
-        } catch (Exception e) {
-            System.out.println("Error extrayendo datos del token: " + e.getMessage());
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            jwt = authHeader.substring(7);
+            System.out.println("JWT token extraído: " + jwt);
+            try {
+                email = jwtUtil.extractUsername(jwt);
+                role = Jwts.parserBuilder()
+                        .setSigningKey(jwtUtil.getSigningKey())
+                        .build()
+                        .parseClaimsJws(jwt)
+                        .getBody()
+                        .get("role", String.class); 
+                System.out.println("Email extraído del token: " + email);
+                System.out.println("Role extraído del token: " + role);
+            } catch (Exception e) {
+                System.out.println("Error extrayendo datos del token: " + e.getMessage());
+            }
+        } else {
+            System.out.println("No se encontró token con formato Bearer en Authorization header");
         }
-    } else {
-        System.out.println("No se encontró token con formato Bearer en Authorization header");
-    }
 
-    if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-        if (jwtUtil.validateToken(jwt)) {
-            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
-            System.out.println("Authorities asignadas: " + authorities);  // Muestra las autoridades asignadas
+        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (jwtUtil.validateToken(jwt)) {
+                List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
+                System.out.println("Authorities asignadas: " + authorities);  
 
-
-            // Establecer la autenticación en el contexto de seguridad
-            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(email, null, authorities);
-            SecurityContextHolder.getContext().setAuthentication(auth);
-            System.out.println("Autenticación establecida para: " + email + " con rol: " + role);
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(email, null, authorities);
+                SecurityContextHolder.getContext().setAuthentication(auth);
+                System.out.println("Autenticación establecida para: " + email + " con rol: " + role);
+            }
         }
-    }
 
-    // Continuar con la cadena de filtros
-    chain.doFilter(request, response);
-}
+        chain.doFilter(request, response);
+    }
 }

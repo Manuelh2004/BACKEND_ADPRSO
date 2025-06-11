@@ -26,14 +26,12 @@ public class AuthService {
     public String login(String email, String password) {
         Optional<UsuarioEntity> usuario = usuarioRepository.findByUsrEmail(email);
         if (usuario.isPresent() && usuario.get().getUsr_password().equals(password)) {
-            // Obtener el rol del usuario
-            String role = usuario.get().getTipoUsuario().getTipus_nombre();  // Esto te dará ROL_ADMIN o ROL_USER
+            String role = usuario.get().getTipoUsuario().getTipus_nombre(); 
             return jwtUtil.generateToken(email, role);
         } else {
             throw new RuntimeException("Credenciales inválidas");
         }
     }
-
 
     public String register(UsuarioEntity usuario) {
         // Verificar si el usuario ya existe
@@ -48,15 +46,12 @@ public class AuthService {
         usuario.setTipoUsuario(tipoUsuario);
 
         if (usuario.getUsr_email() == null) {
-            usuario.setUsr_estado("activo");  // Establecer el estado como "activo" si es nulo
+            usuario.setUsr_estado("activo");  
         }
 
         usuarioRepository.save(usuario);
 
-        // Obtener el rol del nuevo usuario
-        String role = usuario.getTipoUsuario().getTipus_nombre(); // Esto te dará ROL_ADMIN o ROL_USER
-
-        // Generar el token JWT después de registrar al usuario, pasando el rol
+        String role = usuario.getTipoUsuario().getTipus_nombre(); 
         String token = jwtUtil.generateToken(usuario.getUsr_email(), role);
 
         // Enviar correo de bienvenida
@@ -64,13 +59,13 @@ public class AuthService {
             String subject = "¡Bienvenido al Sistema!";
             String body = "<h1>¡Bienvenido, " + usuario.getUsr_email() + "!</h1>" +
                         "<p>Gracias por registrarte en nuestro sistema. Estamos felices de tenerte como parte de nuestra comunidad.</p>" +
-                        "<p>Tu token de acceso es: " + token + "</p>";  // Incluir el token en el correo de bienvenida
+                        "<p>Tu token de acceso es: " + token + "</p>";  
             emailService.sendEmail(usuario.getUsr_email(), subject, body);
         } catch (MessagingException e) {
             throw new RuntimeException("Error al enviar el correo electrónico de bienvenida", e);
         }
 
-        return token;  // Devolvemos el token
+        return token;  
     }
 
 }
