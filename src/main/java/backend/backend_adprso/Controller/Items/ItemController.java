@@ -15,12 +15,11 @@ import backend.backend_adprso.Entity.Items.GustoEntity;
 import backend.backend_adprso.Entity.Items.NivelEnergiaEntity;
 import backend.backend_adprso.Entity.Items.TamanioEntity;
 import backend.backend_adprso.Entity.Items.TipoMascotaEntity;
-import backend.backend_adprso.Entity.Items.TipoPlanEntity;
 import backend.backend_adprso.Entity.Items.TipoUsuarioEntity;
 import backend.backend_adprso.Service.Items.ItemService;
 
 @RestController
-@RequestMapping("/api/item")
+@RequestMapping("/admin/api/item")
 public class ItemController {
     @Autowired
     ItemService itemService; 
@@ -74,10 +73,5 @@ public class ItemController {
         return ResponseEntity.ok(new ApiResponse<>("success", 200, lista, mensaje));
     }
 
-    @GetMapping("/tipo_plan")
-    public ResponseEntity<ApiResponse<List<TipoPlanEntity>>> listarTipoPlan() {
-        List<TipoPlanEntity> lista = itemService.ListarTipoPlan();
-        String mensaje = lista.isEmpty() ? "No se encontraron tipos de planes" : null;
-        return ResponseEntity.ok(new ApiResponse<>("success", 200, lista, mensaje));
-    }
+
 }

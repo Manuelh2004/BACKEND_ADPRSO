@@ -38,23 +38,20 @@ public class AuthController {
         }
     }
 
-      @PostMapping("/register")
+      @PostMapping("/crear_usuario")
     public ResponseEntity<ApiResponse<?>> register(@RequestBody UsuarioEntity usuario) {
         try {
-            // Llamamos al servicio para registrar el usuario y obtener el token
-            String token = authService.register(usuario);  // Ahora también obtenemos el token
+            String token = authService.register(usuario);  
 
-            // Creamos la respuesta con el usuario y el token
             ApiResponse<Map <String, Object>> response = new ApiResponse<>(
                 "success",
                 HttpStatus.CREATED.value(),
-                Map.of("usuario", usuario, "token", token),  // Incluimos tanto el usuario como el token
+                Map.of("usuario", usuario, "token", token),  
                 "Usuario registrado exitosamente"
             );
 
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (RuntimeException e) {
-            // Si ocurre un error, devolvemos un mensaje de error con el código adecuado
             ApiResponse<UsuarioEntity> response = new ApiResponse<>("error", HttpStatus.BAD_REQUEST.value(), null, e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
