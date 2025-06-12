@@ -65,10 +65,7 @@ public class UsuarioService {
 
     //********************************************************* */
     public UsuarioEntity obtenerUsuarioLogueado(String token) {
-        // Extraemos el username (o email) desde el token
         String username = jwtUtil.extractUsername(token);
-
-        // Buscamos al usuario por su username (o email)
         return usuarioRepository.findByUsrEmail(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
     }

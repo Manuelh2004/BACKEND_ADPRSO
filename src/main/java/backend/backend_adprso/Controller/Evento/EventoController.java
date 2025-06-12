@@ -45,27 +45,22 @@ public class EventoController {
     }
 
     /*********************************************************************************************** */
+    /* Guardar un usuario asociado a un evento */
     @PostMapping("/guardar/{eventoId}")
     public ResponseEntity<ApiResponse<Object>> guardarEventoUsuario(@PathVariable Long eventoId,
                                                                    @RequestHeader("Authorization") String authorizationHeader) {
         try {
-            // Extraer el token del encabezado Authorization
             String token = authorizationHeader.replace("Bearer ", "");
 
-            // Verificar que el token sea válido
             if (!jwtUtil.validateToken(token)) {
                 ApiResponse<Object> response = new ApiResponse<>("error", HttpStatus.UNAUTHORIZED.value(), null, "Token no válido");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
-
-            // Llamar al servicio para guardar el evento con el usuario logueado
             eventoService.guardarEventoUsuario(eventoId, token);
 
-            // Respuesta exitosa
             ApiResponse<Object> response = new ApiResponse<>("success", HttpStatus.OK.value(), null, "Evento y usuario guardados correctamente.");
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
-            // Respuesta con error
             ApiResponse<Object> response = new ApiResponse<>("error", HttpStatus.BAD_REQUEST.value(), null, e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }

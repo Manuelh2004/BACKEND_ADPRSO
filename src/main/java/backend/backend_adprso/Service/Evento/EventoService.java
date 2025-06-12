@@ -92,21 +92,16 @@ public class EventoService {
 
     /*********************************************************************************************** */
     public void guardarEventoUsuario(Long eventoId, String token) {
-        // Obtener el usuario logueado utilizando el token
         UsuarioEntity usuarioLogueado = usuarioService.obtenerUsuarioLogueado(token);
 
-        // Verificar si ya existe la relación
         if (!eventoUsuarioRepository.existsByEventoAndUsuario(eventoId, usuarioLogueado.getUsr_id())) {
-            // Si no existe, obtener el evento
             EventoEntity evento = eventoRepository.findById(eventoId)
                     .orElseThrow(() -> new RuntimeException("Evento no encontrado"));
 
-            // Crear el nuevo EventoUsuarioEntity
             EventoUsuarioEntity eventoUsuario = new EventoUsuarioEntity();
             eventoUsuario.setEvento(evento);
             eventoUsuario.setUsuario(usuarioLogueado);
 
-            // Guardar la relación en la base de datos
             eventoUsuarioRepository.save(eventoUsuario);
         } else {
             throw new RuntimeException("El usuario ya está registrado para este evento");
