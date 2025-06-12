@@ -3,24 +3,27 @@ package backend.backend_adprso.Controller.Evento;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import backend.backend_adprso.Controller.Response.ApiResponse;
 import backend.backend_adprso.Entity.Evento.EventoEntity;
-import backend.backend_adprso.Entity.Evento.EventoUsuarioEntity;
+import backend.backend_adprso.Service.AuthService.JwtUtil;
 import backend.backend_adprso.Service.Evento.EventoService;
 
 @RestController
 @RequestMapping("/api/evento")
 public class EventoController {
     @Autowired
-    EventoService eventoService;   
+    EventoService eventoService; 
+    @Autowired
+    private JwtUtil jwtUtil; // Dependencia de JwtUtil  
 
     @GetMapping("/activos/public")
     public ResponseEntity<ApiResponse<List<EventoEntity>>> listarEventosActivos() {
@@ -42,22 +45,29 @@ public class EventoController {
     }
 
     /*********************************************************************************************** */
-
-    @PostMapping("/asignar_usuario")
-    public ResponseEntity<ApiResponse<EventoUsuarioEntity>> registrarEventoUsuario(
-            @RequestParam Long eventoId, 
-            @RequestParam Long usuarioId) {
-
+    @PostMapping("/guardar/{eventoId}")
+    public ResponseEntity<ApiResponse<Object>> guardarEventoUsuario(@PathVariable Long eventoId,
+                                                                   @RequestHeader("Authorization") String authorizationHeader) {
         try {
-            // Registrar el evento-usuario y obtener la relación
-            EventoUsuarioEntity eventoUsuario = eventoService.registrarEventoUsuario(eventoId, usuarioId);
-            return ResponseEntity.ok(
-                new ApiResponse<>("success", 200, eventoUsuario, "Evento y Usuario registrados exitosamente.")
-            );
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(400).body(
-                new ApiResponse<>("error", 400, null, e.getMessage())
-            );
+            // Extraer el token del encabezado Authorization
+            String token = authorizationHeader.replace("Bearer ", "");
+
+            // Verificar que el token sea válido
+            if (!jwtUtil.validateToken(token)) {
+                ApiResponse<Object> response = new ApiResponse<>("error", HttpStatus.UNAUTHORIZED.value(), null, "Token no válido");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+
+            // Llamar al servicio para guardar el evento con el usuario logueado
+            eventoService.guardarEventoUsuario(eventoId, token);
+
+            // Respuesta exitosa
+            ApiResponse<Object> response = new ApiResponse<>("success", HttpStatus.OK.value(), null, "Evento y usuario guardados correctamente.");
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            // Respuesta con error
+            ApiResponse<Object> response = new ApiResponse<>("error", HttpStatus.BAD_REQUEST.value(), null, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 }

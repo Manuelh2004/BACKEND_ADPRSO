@@ -3,12 +3,15 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import backend.backend_adprso.Entity.Items.TipoUsuarioEntity;
 import backend.backend_adprso.Entity.Usuario.UsuarioEntity;
 import backend.backend_adprso.Repository.TipoUsuarioRepository;
 import backend.backend_adprso.Repository.UsuarioRepository;
+import backend.backend_adprso.Service.AuthService.JwtUtil;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -17,6 +20,8 @@ public class UsuarioService {
     UsuarioRepository usuarioRepository;
     @Autowired
     TipoUsuarioRepository tipoUsuarioRepository;
+    @Autowired
+    private JwtUtil jwtUtil;
 
     public List<UsuarioEntity> listarUsuarios() {
         return usuarioRepository.findAll();
@@ -56,5 +61,15 @@ public class UsuarioService {
         } else {
             return null; 
         }
+    }
+
+    //********************************************************* */
+    public UsuarioEntity obtenerUsuarioLogueado(String token) {
+        // Extraemos el username (o email) desde el token
+        String username = jwtUtil.extractUsername(token);
+
+        // Buscamos al usuario por su username (o email)
+        return usuarioRepository.findByUsrEmail(username)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
     }
 }

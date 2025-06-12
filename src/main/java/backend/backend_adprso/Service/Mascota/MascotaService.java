@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import backend.backend_adprso.Entity.Evento.EventoEntity;
 import backend.backend_adprso.Entity.Items.GustoEntity;
 import backend.backend_adprso.Entity.Items.ImagenEntity;
 import backend.backend_adprso.Entity.Mascota.GustoMascotaEntity;

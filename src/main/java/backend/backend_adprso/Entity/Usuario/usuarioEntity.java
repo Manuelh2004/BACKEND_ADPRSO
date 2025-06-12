@@ -54,4 +54,6 @@ public class UsuarioEntity {
     public String getRol() {
         return tipoUsuario != null ? tipoUsuario.getTipus_nombre() : null; // ROL_ADMIN o ROL_USER
     }
+
+    
 }

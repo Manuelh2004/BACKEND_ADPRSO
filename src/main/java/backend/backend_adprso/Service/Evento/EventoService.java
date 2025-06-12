@@ -12,6 +12,7 @@ import backend.backend_adprso.Entity.Usuario.UsuarioEntity;
 import backend.backend_adprso.Repository.EventoRepository;
 import backend.backend_adprso.Repository.EventoUsuarioRepository;
 import backend.backend_adprso.Repository.UsuarioRepository;
+import backend.backend_adprso.Service.Usuario.UsuarioService;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -22,6 +23,8 @@ public class EventoService {
     private EventoUsuarioRepository eventoUsuarioRepository;
     @Autowired
     private UsuarioRepository usuarioRepository;
+    @Autowired
+    private UsuarioService usuarioService;
 
     public List<EventoEntity> ListarEventos() {
         return eventoRepository.findAll();
@@ -88,27 +91,27 @@ public class EventoService {
     }
 
     /*********************************************************************************************** */
+    public void guardarEventoUsuario(Long eventoId, String token) {
+        // Obtener el usuario logueado utilizando el token
+        UsuarioEntity usuarioLogueado = usuarioService.obtenerUsuarioLogueado(token);
 
-    // Método para registrar un evento_usuario asignando un evento a un usuario
-    public EventoUsuarioEntity registrarEventoUsuario(Long eventoId, Long usuarioId) {
-        // Buscar el evento por su ID
-        EventoEntity evento = eventoRepository.findById(eventoId).orElse(null);
+        // Verificar si ya existe la relación
+        if (!eventoUsuarioRepository.existsByEventoAndUsuario(eventoId, usuarioLogueado.getUsr_id())) {
+            // Si no existe, obtener el evento
+            EventoEntity evento = eventoRepository.findById(eventoId)
+                    .orElseThrow(() -> new RuntimeException("Evento no encontrado"));
 
-        // Buscar el usuario por su ID
-        UsuarioEntity usuario = usuarioRepository.findById(usuarioId).orElse(null);
+            // Crear el nuevo EventoUsuarioEntity
+            EventoUsuarioEntity eventoUsuario = new EventoUsuarioEntity();
+            eventoUsuario.setEvento(evento);
+            eventoUsuario.setUsuario(usuarioLogueado);
 
-        // Verificar si tanto el evento como el usuario existen
-        if (evento == null || usuario == null) {
-            throw new IllegalArgumentException("Evento o Usuario no encontrado.");
+            // Guardar la relación en la base de datos
+            eventoUsuarioRepository.save(eventoUsuario);
+        } else {
+            throw new RuntimeException("El usuario ya está registrado para este evento");
         }
-
-        // Crear la entidad EventoUsuarioEntity y asignar el evento y el usuario
-        EventoUsuarioEntity eventoUsuario = new EventoUsuarioEntity();
-        eventoUsuario.setEvento(evento);
-        eventoUsuario.setUsuario(usuario);
-
-        // Guardar la relación en la base de datos
-        return eventoUsuarioRepository.save(eventoUsuario);
     }
+   
 
 }
