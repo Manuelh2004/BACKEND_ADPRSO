@@ -33,10 +33,11 @@ public interface MascotaRepository extends JpaRepository<MascotaEntity, Long> {
 
     // Filtrar por múltiples criterios (opcional, si quieres filtrar por todos juntos)
     @Query("SELECT m FROM MascotaEntity m WHERE " +
-           "(:sexId IS NULL OR m.sexo.sex_id = :sexId) AND " +
-           "(:tamId IS NULL OR m.tamanio.tam_id = :tamId) AND " +
-           "(:nienId IS NULL OR m.nivel_energia.nien_id = :nienId) AND " +
-           "(:tipmaId IS NULL OR m.tipo_mascota.tipma_id = :tipmaId)")
+            "(:sexId IS NULL OR m.sexo.sex_id = :sexId) AND " +
+            "(:tamId IS NULL OR m.tamanio.tam_id = :tamId) AND " +
+            "(:nienId IS NULL OR m.nivel_energia.nien_id = :nienId) AND " +
+            "(:tipmaId IS NULL OR m.tipo_mascota.tipma_id = :tipmaId) AND " +
+            "m.masc_estado = 1")
     List<MascotaEntity> findByFilters(@Param("sexId") Long sexId,
                                       @Param("tamId") Long tamId,
                                       @Param("nienId") Long nienId,

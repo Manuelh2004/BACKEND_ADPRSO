@@ -36,14 +36,15 @@ public class MascotaController {
     }   
 
     @GetMapping("/filter/public")
-    public ResponseEntity<List<MascotaEntity>> filtrarMascotas(
+    public ResponseEntity<ApiResponse<List<MascotaImagenDTO>>> filtrarMascotas(
         @RequestParam(required = false) Long sexId,
         @RequestParam(required = false) Long tamId,
         @RequestParam(required = false) Long nienId,
         @RequestParam(required = false) Long tipmaId) {
 
-        List<MascotaEntity> resultados = mascotaService.filtrarPorFiltros(sexId, tamId, nienId, tipmaId);
-        return ResponseEntity.ok(resultados);
+        List<MascotaImagenDTO> mascotasConImagenes = mascotaService.filtrarPorFiltros(sexId, tamId, nienId, tipmaId);
+        ApiResponse<List<MascotaImagenDTO>> response = new ApiResponse<>("success", 200, mascotasConImagenes, "Mascotas filtradas con imágenes");
+        return ResponseEntity.ok(response);
     }
 
     // Endpoint para obtener solo el nombre de la mascota y las imágenes asociadas
