@@ -2,27 +2,10 @@ package backend.backend_adprso.Service.Items;
 
 import java.util.List;
 
+import backend.backend_adprso.Entity.Items.*;
+import backend.backend_adprso.Repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import backend.backend_adprso.Entity.Items.EstadoSaludEntity;
-import backend.backend_adprso.Entity.Items.EstadoVacunaEntity;
-import backend.backend_adprso.Entity.Items.GustoEntity;
-import backend.backend_adprso.Entity.Items.NivelEnergiaEntity;
-import backend.backend_adprso.Entity.Items.TamanioEntity;
-import backend.backend_adprso.Entity.Items.TipoDocumentoEntity;
-import backend.backend_adprso.Entity.Items.TipoMascotaEntity;
-import backend.backend_adprso.Entity.Items.TipoPlanEntity;
-import backend.backend_adprso.Entity.Items.TipoUsuarioEntity;
-import backend.backend_adprso.Repository.EstadoSaludRepository;
-import backend.backend_adprso.Repository.EstadoVacunaRepository;
-import backend.backend_adprso.Repository.GustoRepository;
-import backend.backend_adprso.Repository.NivelEnergiaRepository;
-import backend.backend_adprso.Repository.TamanioRepository;
-import backend.backend_adprso.Repository.TipoDocumentoRespository;
-import backend.backend_adprso.Repository.TipoMascotaRepository;
-import backend.backend_adprso.Repository.TipoPlanRepository;
-import backend.backend_adprso.Repository.TipoUsuarioRepository;
 
 @Service
 public class ItemService {
@@ -44,6 +27,8 @@ public class ItemService {
     TipoUsuarioRepository tipoUsuarioRepository;
     @Autowired
     TipoDocumentoRespository tipoDocumentoRepository;
+    @Autowired
+    SexoRepository sexoRepository;
 
     public List<EstadoSaludEntity> ListarEstadoSalud() {
         return estadoSaludRepository.findAll();
@@ -76,9 +61,13 @@ public class ItemService {
 
     public List<TipoUsuarioEntity> ListarTipoUsuario() {
         return tipoUsuarioRepository.findAll();
-    }       
+    }
 
-     public TipoDocumentoEntity getTipoDocumentoById(Long id) {
+    public List<SexoEntity> ListarSexo() {
+        return sexoRepository.findAll();
+    }
+
+    public TipoDocumentoEntity getTipoDocumentoById(Long id) {
         return tipoDocumentoRepository.findById(id).orElse(null);  // Retorna el tipo de documento o null si no se encuentra
     }
 

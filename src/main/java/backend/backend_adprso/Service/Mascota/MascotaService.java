@@ -154,8 +154,15 @@ public class MascotaService {
     // *************************************************************
 
     // Filtros múltiples con parámetros opcionales
-    public List<MascotaEntity> filtrarPorFiltros(Long sexId, Long tamId, Long nienId, Long tipmaId) {
-        return mascotaRepository.findByFilters(sexId, tamId, nienId, tipmaId);
+    public List<MascotaImagenDTO> filtrarPorFiltros(Long sexId, Long tamId, Long nienId, Long tipmaId) {
+        List<MascotaEntity> mascotas = mascotaRepository.findByFilters(sexId,tamId,nienId,tipmaId);
+        return mascotas.stream().map(mascota -> {
+            List<String> imagenUrls = mascota.getImagenes().stream()
+                    .map(ImagenEntity::getIma_url)
+                    .limit(2)  // Solo las primeras dos imágenes
+                    .collect(Collectors.toList());
+            return new MascotaImagenDTO(mascota.getMasc_id(), mascota.getMasc_nombre(), imagenUrls);
+        }).collect(Collectors.toList());
     }
     // *************************************************************
 }
