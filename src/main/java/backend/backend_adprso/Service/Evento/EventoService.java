@@ -1,5 +1,6 @@
 package backend.backend_adprso.Service.Evento;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -91,6 +92,8 @@ public class EventoService {
     }
 
     /*********************************************************************************************** */
+    /* Eventos asociado al usuario logueado */
+
     public void guardarEventoUsuario(Long eventoId, String token) {
         UsuarioEntity usuarioLogueado = usuarioService.obtenerUsuarioLogueado(token);
 
@@ -106,6 +109,17 @@ public class EventoService {
         } else {
             throw new RuntimeException("El usuario ya está registrado para este evento");
         }
+    }
+
+    public List<EventoEntity> listarEventosDelUsuario(String token) {
+        UsuarioEntity usuarioLogueado = usuarioService.obtenerUsuarioLogueado(token);
+        List<EventoUsuarioEntity> eventoUsuarios = eventoUsuarioRepository.findByUsuario(usuarioLogueado);
+
+        List<EventoEntity> eventos = new ArrayList<>();
+        for (EventoUsuarioEntity eventoUsuario : eventoUsuarios) {
+            eventos.add(eventoUsuario.getEvento());
+        }
+        return eventos;
     }
    
 

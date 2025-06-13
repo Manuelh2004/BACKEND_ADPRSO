@@ -1,10 +1,14 @@
 package backend.backend_adprso.Repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import backend.backend_adprso.Entity.Evento.EventoUsuarioEntity;
+import backend.backend_adprso.Entity.Usuario.UsuarioEntity;
 
 @Repository
 public interface EventoUsuarioRepository extends JpaRepository<EventoUsuarioEntity, Long>{
@@ -12,4 +16,7 @@ public interface EventoUsuarioRepository extends JpaRepository<EventoUsuarioEnti
            "FROM EventoUsuarioEntity eu " +
            "WHERE eu.evento.even_id = :eventoId AND eu.usuario.usr_id = :usuarioId")
     boolean existsByEventoAndUsuario(Long eventoId, Long usuarioId);
+
+    @Query("SELECT eu FROM EventoUsuarioEntity eu WHERE eu.usuario = :usuario")
+    List<EventoUsuarioEntity> findByUsuario(@Param("usuario") UsuarioEntity usuario);
 }

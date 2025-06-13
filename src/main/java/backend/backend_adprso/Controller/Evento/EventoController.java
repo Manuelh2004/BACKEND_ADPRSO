@@ -45,6 +45,8 @@ public class EventoController {
     }
 
     /*********************************************************************************************** */
+    /* Eventos asociado al usuario logueado */
+
     /* Guardar un usuario asociado a un evento */
     @PostMapping("/guardar/{eventoId}")
     public ResponseEntity<ApiResponse<Object>> guardarEventoUsuario(@PathVariable Long eventoId,
@@ -62,6 +64,32 @@ public class EventoController {
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             ApiResponse<Object> response = new ApiResponse<>("error", HttpStatus.BAD_REQUEST.value(), null, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    /* Listar los eventos asociado a un usuario */
+    @GetMapping("/mis_eventos")
+    public ResponseEntity<ApiResponse<List<EventoEntity>>> listarEventosDelUsuario(@RequestHeader("Authorization") String authorizationHeader) {
+        try {
+            // Extraer el token del encabezado Authorization
+            String token = authorizationHeader.replace("Bearer ", "");
+
+            // Verificar que el token sea válido
+            if (!jwtUtil.validateToken(token)) {
+                ApiResponse<List<EventoEntity>> response = new ApiResponse<>("error", HttpStatus.UNAUTHORIZED.value(), null, "Token no válido");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+
+            // Llamar al servicio para obtener los eventos del usuario logueado
+            List<EventoEntity> eventos = eventoService.listarEventosDelUsuario(token);
+
+            // Respuesta exitosa
+            ApiResponse<List<EventoEntity>> response = new ApiResponse<>("success", HttpStatus.OK.value(), eventos, "Eventos obtenidos correctamente.");
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            // Respuesta con error
+            ApiResponse<List<EventoEntity>> response = new ApiResponse<>("error", HttpStatus.BAD_REQUEST.value(), null, e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
