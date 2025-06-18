@@ -44,8 +44,8 @@ public class SecurityConfig {
                 .requestMatchers(request -> endsWithUserRequestMatcher().matches((HttpServletRequest) request)) // Usar EndsWithUserRequestMatcher para rutas que terminan con "/user"Add commentMore actions
                 .permitAll()  // Permitir acceso a esas rutas
                 .requestMatchers("/auth/**").permitAll() 
-                .requestMatchers("/admin/**").hasAuthority("ROLE_ADMINISTRADOR")  // Rutas /admin/** solo accesibles para los ADMIN
-                .requestMatchers("/user/**").hasAuthority("ROLE_USUARIO")  // Rutas /user/** solo accesibles para los USER
+                .requestMatchers("/admin/**").hasAuthority("ROLE_ADMINI")  // Rutas /admin/** solo accesibles para los ADMIN
+                .requestMatchers("/user/**").hasAuthority("ROLE_USER")  // Rutas /user/** solo accesibles para los USER
                 .anyRequest().authenticated() // Requiere autenticación para cualquier otra ruta
             )
             .exceptionHandling(ex -> ex
