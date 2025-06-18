@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import backend.backend_adprso.Controller.Response.ApiResponse;
 import backend.backend_adprso.Entity.Adopcion.AdopcionEntity;
-import backend.backend_adprso.Entity.Evento.EventoEntity;
 import backend.backend_adprso.Service.Adopcion.AdopcionService;
 
 @RestController
@@ -56,8 +55,14 @@ public class AdopcionAdminController {
     @GetMapping("/{id}")
     public ApiResponse<AdopcionEntity> obtenerAdopcionPorId(@PathVariable Long id) {
         AdopcionEntity adopcion = adopcionService.obtenerAdopcionPorId(id);
+        
+        if (adopcion == null) {
+            return new ApiResponse<>("error", 404, null, "Adopción no encontrada");
+        }
+        
         return new ApiResponse<>("success", 200, adopcion, "Adopción encontrada");
     }
+
 
     @PutMapping("/{id}/estado")
     public ResponseEntity<ApiResponse<AdopcionEntity>> cambiarEstado(
@@ -68,11 +73,11 @@ public class AdopcionAdminController {
         
         if (adopcion != null) {
             return ResponseEntity.ok(
-                new ApiResponse<>("success", 200, adopcion, "Estado del evento actualizado exitosamente")
+                new ApiResponse<>("success", 200, adopcion, "Estado de la adopción actualizada exitosamente")
             );
         } else {
             return ResponseEntity.status(404).body(
-                new ApiResponse<>("error", 404, null, "Evento no encontrado")
+                new ApiResponse<>("error", 404, null, "Adopción no encontrada")
             );
         }
     }    

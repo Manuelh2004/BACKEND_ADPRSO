@@ -45,7 +45,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                         .build()
                         .parseClaimsJws(jwt)
                         .getBody()
-                        .get("role", String.class); 
+                        .get("role", String.class);
                 System.out.println("Email extraído del token: " + email);
                 System.out.println("Role extraído del token: " + role);
             } catch (Exception e) {

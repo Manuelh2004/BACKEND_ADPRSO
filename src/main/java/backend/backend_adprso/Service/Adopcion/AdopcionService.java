@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import backend.backend_adprso.Entity.Adopcion.AdopcionEntity;
-import backend.backend_adprso.Entity.Evento.EventoEntity;
 import backend.backend_adprso.Entity.Mascota.MascotaEntity;
 import backend.backend_adprso.Entity.Usuario.UsuarioEntity;
 import backend.backend_adprso.Repository.AdopcionRepository;
@@ -55,13 +54,13 @@ public class AdopcionService {
                 .orElseThrow(() -> new RuntimeException("Adopción no encontrada"));
     }
 
-    public List<AdopcionEntity> listarAdopcionesAceptadas() {
-        return adopcionRepository.findByEvenEstado(1); 
-    }
-
     public List<AdopcionEntity> listarAdopcionesPendientes() {
         return adopcionRepository.findByEvenEstado(0); 
     }
+
+    public List<AdopcionEntity> listarAdopcionesAceptadas() {
+        return adopcionRepository.findByEvenEstado(1); 
+    }    
 
     public List<AdopcionEntity> listarAdopcionesRechazadas() {
         return adopcionRepository.findByEvenEstado(2); 
