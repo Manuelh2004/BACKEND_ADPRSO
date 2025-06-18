@@ -3,6 +3,8 @@ package backend.backend_adprso.Controller.Mascota;
 import java.util.List;
 import java.util.Optional;
 
+import backend.backend_adprso.Entity.Mascota.MascotaDetalleDTO;
+import backend.backend_adprso.Entity.Mascota.MascotaRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +33,13 @@ public class MascotaAdminController {
         List<MascotaEntity> mascotas = mascotaService.listarMascotas();
         ApiResponse<List<MascotaEntity>> response = new ApiResponse<>("success", 200, mascotas, "Lista de mascotas");
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/registrar")
+    public ResponseEntity<ApiResponse<MascotaEntity>> registrarMascota(@RequestBody MascotaRequestDTO dto) {
+        MascotaEntity mascotaGuardada = mascotaService.registrar(dto);
+        ApiResponse<MascotaEntity> response = new ApiResponse<>("success", 201, mascotaGuardada, "Mascota registrada");
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/registrar_mascota")

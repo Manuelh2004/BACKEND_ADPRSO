@@ -5,19 +5,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import backend.backend_adprso.Entity.Mascota.MascotaDetalleDTO;
+import backend.backend_adprso.Entity.Mascota.*;
+import backend.backend_adprso.Repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import backend.backend_adprso.Entity.Items.GustoEntity;
 import backend.backend_adprso.Entity.Items.ImagenEntity;
-import backend.backend_adprso.Entity.Mascota.GustoMascotaEntity;
-import backend.backend_adprso.Entity.Mascota.MascotaEntity;
-import backend.backend_adprso.Entity.Mascota.MascotaImagenDTO;
-import backend.backend_adprso.Repository.GustoMascotaRepository;
-import backend.backend_adprso.Repository.GustoRepository;
-import backend.backend_adprso.Repository.ImagenRepository;
-import backend.backend_adprso.Repository.MascotaRepository;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -30,6 +24,19 @@ public class MascotaService {
     GustoRepository gustoRepository;
     @Autowired
     ImagenRepository imagenRepository;
+
+    @Autowired
+    SexoRepository sexoRepository;
+    @Autowired
+    TamanioRepository tamanioRepository;
+    @Autowired
+    NivelEnergiaRepository nivelEnergiaRepository;
+    @Autowired
+    TipoMascotaRepository tipoMascotaRepository;
+    @Autowired
+    EstadoSaludRepository estadoSaludRepository;
+    @Autowired
+    EstadoVacunaRepository estadoVacunaRepository;
 
     @Transactional
     public List<MascotaEntity> listarMascotas() {
@@ -99,6 +106,52 @@ public class MascotaService {
         dto.setImagenes_url(urls);
 
         return dto;
+    }
+
+    @Transactional
+    public MascotaEntity registrar(MascotaRequestDTO dto) {
+        MascotaEntity mascota = new MascotaEntity();
+
+        mascota.setMasc_nombre(dto.getNombre());
+        mascota.setMasc_fecha_nacimiento(dto.getFechaNacimiento());
+        mascota.setMasc_fecha_registro(LocalDate.now());
+        mascota.setMasc_historia(dto.getHistoria());
+        mascota.setMasc_observacion(dto.getObservacion());
+        mascota.setMasc_estado(1); // Activa
+
+        // Relaciones
+        mascota.setSexo(sexoRepository.findById(dto.getSexoId()).orElseThrow());
+        mascota.setTamanio(tamanioRepository.findById(dto.getTamanioId()).orElseThrow());
+        mascota.setNivel_energia(nivelEnergiaRepository.findById(dto.getNivelEnergiaId()).orElseThrow());
+        mascota.setTipo_mascota(tipoMascotaRepository.findById(dto.getTipoMascotaId()).orElseThrow());
+        mascota.setEstado_salud(estadoSaludRepository.findById(dto.getEstadoSaludId()).orElseThrow());
+        mascota.setEstado_vacuna(estadoVacunaRepository.findById(dto.getEstadoVacunaId()).orElseThrow());
+
+        // Guardamos mascota primero (para tener ID)
+        MascotaEntity mascotaGuardada = mascotaRepository.save(mascota);
+
+        // Guardar imágenes
+        if (dto.getImagenesUrls() != null) {
+            for (String url : dto.getImagenesUrls()) {
+                ImagenEntity imagen = new ImagenEntity();
+                imagen.setIma_url(url);
+                imagen.setMascota(mascotaGuardada);
+                imagenRepository.save(imagen);
+            }
+        }
+
+        // Guardar gustos
+        if (dto.getGustoIds() != null) {
+            for (Long gustoId : dto.getGustoIds()) {
+                GustoEntity gusto = gustoRepository.findById(gustoId).orElseThrow();
+                GustoMascotaEntity gm = new GustoMascotaEntity();
+                gm.setMasc_id(mascotaGuardada);
+                gm.setGust_id(gusto);
+                gustoMascotaRepository.save(gm);
+            }
+        }
+
+        return mascotaGuardada;
     }
     
     @Transactional

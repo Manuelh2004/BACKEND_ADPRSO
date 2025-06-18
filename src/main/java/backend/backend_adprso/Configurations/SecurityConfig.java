@@ -12,6 +12,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import backend.backend_adprso.Filter.JwtRequestFilter;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -29,13 +31,21 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable()) 
+        http.cors(cors -> cors.configurationSource(request -> {
+                    var corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
+                    corsConfiguration.setAllowedOrigins(List.of("http://localhost:5173"));
+                    corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+                    corsConfiguration.setAllowedHeaders(List.of("*"));
+                    corsConfiguration.setAllowCredentials(true);
+                    return corsConfiguration;
+                }))
+                .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(request -> endsWithUserRequestMatcher().matches((HttpServletRequest) request)) // Usar EndsWithUserRequestMatcher para rutas que terminan con "/user"Add commentMore actions
                 .permitAll()  // Permitir acceso a esas rutas
                 .requestMatchers("/auth/**").permitAll() 
-                .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")  // Rutas /admin/** solo accesibles para los ADMIN
-                .requestMatchers("/user/**").hasAuthority("ROLE_USER")  // Rutas /user/** solo accesibles para los USER
+                .requestMatchers("/admin/**").hasAuthority("ROLE_ADMINISTRADOR")  // Rutas /admin/** solo accesibles para los ADMIN
+                .requestMatchers("/user/**").hasAuthority("ROLE_USUARIO")  // Rutas /user/** solo accesibles para los USER
                 .anyRequest().authenticated() // Requiere autenticación para cualquier otra ruta
             )
             .exceptionHandling(ex -> ex
