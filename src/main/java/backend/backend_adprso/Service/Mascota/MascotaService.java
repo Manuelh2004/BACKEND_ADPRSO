@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import backend.backend_adprso.Entity.Mascota.MascotaDetalleDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,6 +48,57 @@ public class MascotaService {
             return Optional.of(mascota);
         }
         return Optional.empty();
+    }
+
+    @Transactional
+    public Optional<MascotaDetalleDTO> obtenerDetalleMascota(Long id) {
+        return mascotaRepository.findById(id)
+                .map(this::mapToDetalleDto);
+    }
+
+    /* ---------- Mapper entity → DTO ---------- */
+    private MascotaDetalleDTO mapToDetalleDto(MascotaEntity e) {
+
+        MascotaDetalleDTO dto = new MascotaDetalleDTO();
+
+        /* campos directos ------------------------------------ */
+        dto.setMasc_id(e.getMasc_id());
+        dto.setMasc_nombre(e.getMasc_nombre());
+        dto.setMasc_fecha_nacimiento(e.getMasc_fecha_nacimiento());
+        dto.setMasc_fecha_registro(e.getMasc_fecha_registro());
+        dto.setMasc_historia(e.getMasc_historia());
+        dto.setMasc_observacion(e.getMasc_observacion());
+        dto.setMasc_estado(
+                e.getMasc_estado() != null && e.getMasc_estado() == 1 ? "ACTIVO" : "INACTIVO"
+        );
+
+        /* catálogos (ManyToOne) ------------------------------ */
+        dto.setSexo(          e.getSexo()          != null ? e.getSexo().getSex_nombre()          : null);
+        dto.setTamanio(       e.getTamanio()       != null ? e.getTamanio().getTam_nombre()       : null);
+        dto.setNivel_energia( e.getNivel_energia() != null ? e.getNivel_energia().getNien_nombre(): null);
+        dto.setTipo_mascota(  e.getTipo_mascota()  != null ? e.getTipo_mascota().getTipma_nombre(): null);
+        dto.setEstado_salud(  e.getEstado_salud()  != null ? e.getEstado_salud().getEstsa_nombre(): null);
+        dto.setEstado_vacuna( e.getEstado_vacuna() != null ? e.getEstado_vacuna().getEstva_nombre(): null);
+
+        /* gustos (OneToMany) -------------------------------- */
+        List<String> gustos = e.getGustoMascotaList() == null
+                ? List.of()
+                : e.getGustoMascotaList()
+                .stream()
+                .map(gm -> gm.getGust_id().getGust_nombre())
+                .toList();
+        dto.setMasc_gustos(gustos);
+
+        /* imágenes ------------------------------------------ */
+        List<String> urls = e.getImagenes() == null
+                ? List.of()
+                : e.getImagenes()
+                .stream()
+                .map(ImagenEntity::getIma_url)  // asumiendo campo imag_url
+                .toList();
+        dto.setImagenes_url(urls);
+
+        return dto;
     }
     
     @Transactional
