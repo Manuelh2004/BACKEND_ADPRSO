@@ -3,6 +3,7 @@ package backend.backend_adprso.Controller.Mascota;
 import java.util.List;
 import java.util.Optional;
 
+import backend.backend_adprso.Entity.Mascota.MascotaDetalleDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,24 @@ public class MascotaController {
             ApiResponse<MascotaEntity> response = new ApiResponse<>("error", 404, null, "Mascota no encontrada");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
-    }   
+    }
+
+    @GetMapping("/detalle/{id}/public")
+    public ResponseEntity<ApiResponse<MascotaDetalleDTO>> obtenerDetalleMascota(
+            @PathVariable Long id) {
+
+        return mascotaService.obtenerDetalleMascota(id)
+                .map(dto -> ResponseEntity.ok(
+                        new ApiResponse<>("success",
+                                HttpStatus.OK.value(),
+                                dto,
+                                "Mascota encontrada")))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ApiResponse<>("error",
+                                HttpStatus.NOT_FOUND.value(),
+                                null,
+                                "Mascota no encontrada")));
+    }
 
     @GetMapping("/filter/public")
     public ResponseEntity<ApiResponse<List<MascotaImagenDTO>>> filtrarMascotas(
