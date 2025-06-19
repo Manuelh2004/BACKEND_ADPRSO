@@ -34,15 +34,21 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))  // Habilitar CORS y usar configuración custom
+         http.cors(cors -> cors.configurationSource(request -> {
+                    var corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
+                    corsConfiguration.setAllowedOrigins(List.of("http://localhost:5173"));
+                    corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+                    corsConfiguration.setAllowedHeaders(List.of("*"));
+                    corsConfiguration.setAllowCredentials(true);
+                    return corsConfiguration;
+                }))
             .csrf(csrf -> csrf.disable()) 
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(request -> endsWithUserRequestMatcher().matches((HttpServletRequest) request)) // Usar EndsWithUserRequestMatcher para rutas que terminan con "/user"Add commentMore actions
                 .permitAll()  // Permitir acceso a esas rutas
                 .requestMatchers("/auth/**").permitAll() 
-                .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")  // Rutas /admin/** solo accesibles para los ADMIN
-                .requestMatchers("/user/**").hasAuthority("ROLE_USER")  // Rutas /user/** solo accesibles para los USER
+                .requestMatchers("/admin/**").hasAuthority("Administrador")  // Rutas /admin/** solo accesibles para los ADMIN
+                .requestMatchers("/user/**").hasAuthority("Usuario")  // Rutas /user/** solo accesibles para los USER
                 .anyRequest().authenticated() // Requiere autenticación para cualquier otra ruta
             )
             .exceptionHandling(ex -> ex
@@ -57,16 +63,5 @@ public class SecurityConfig {
 
         return http.build();
     }
-     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));  // Origen permitido
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);  // Aplica para todas las rutas
-        return source;
-    }
+  
 }

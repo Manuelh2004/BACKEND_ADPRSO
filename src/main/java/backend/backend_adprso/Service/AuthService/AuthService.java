@@ -26,7 +26,7 @@ public class AuthService {
     public String login(String email, String password) {
         Optional<UsuarioEntity> usuario = usuarioRepository.findByUsrEmail(email);
         if (usuario.isPresent() && usuario.get().getUsr_password().equals(password)) {
-            String role = usuario.get().getTipoUsuario().getTipus_nombre(); 
+            String role = usuario.get().getTipoUsuario().getTipus_nombre();
             return jwtUtil.generateToken(email, role);
         } else {
             throw new RuntimeException("Credenciales inválidas");
@@ -51,7 +51,7 @@ public class AuthService {
 
         usuarioRepository.save(usuario);
 
-        String role = usuario.getTipoUsuario().getTipus_nombre(); 
+        String role = usuario.getTipoUsuario().getTipus_nombre();
         String token = jwtUtil.generateToken(usuario.getUsr_email(), role);
 
         // Enviar correo de bienvenida
@@ -67,5 +67,4 @@ public class AuthService {
 
         return token;  
     }
-
 }
