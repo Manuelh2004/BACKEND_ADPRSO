@@ -3,8 +3,6 @@ package backend.backend_adprso.Controller.Usuario;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,7 +31,7 @@ public class UsuarioAdminController {
         return new ApiResponse<>("success", 200, usuarios, "Usuarios listados correctamente.");
     }
 
-     @PostMapping("/registrar_usuario")
+    @PostMapping("/registrar_usuario")
     public ApiResponse<UsuarioEntity> registrarUsuario(@RequestBody UsuarioEntity usuario) {
         try {
             UsuarioEntity usuarioGuardado = usuarioService.registrarUsuario(usuario);
@@ -62,7 +60,6 @@ public class UsuarioAdminController {
         }
     }
 
-    
 
    
 }

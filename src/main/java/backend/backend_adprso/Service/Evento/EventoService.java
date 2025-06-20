@@ -3,10 +3,12 @@ package backend.backend_adprso.Service.Evento;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import backend.backend_adprso.Entity.Adopcion.AdopcionEntity;
 import backend.backend_adprso.Entity.Evento.EventoEntity;
 import backend.backend_adprso.Entity.Evento.EventoUsuarioEntity;
 import backend.backend_adprso.Entity.Usuario.UsuarioEntity;
@@ -91,6 +93,21 @@ public class EventoService {
         }
     }
 
+    public List<UsuarioEntity> obtenerUsuariosPorEvento(Long eventoId) {
+        List<EventoUsuarioEntity> eventoUsuarioList = eventoUsuarioRepository.findByEventoEvenId(eventoId);
+        return eventoUsuarioList.stream()
+                .map(EventoUsuarioEntity::getUsuario) 
+                .collect(Collectors.toList());
+    }
+
+    public List<EventoEntity> listarEventosInactivos() {
+        return eventoRepository.findByEvenEstado(0); 
+    }    
+
+    public List<EventoEntity> buscarPorNombre(String nombre) {
+        return eventoRepository.buscarPorNombre(nombre);
+    }
+
     /*********************************************************************************************** */
     /* Eventos asociado al usuario logueado */
 
@@ -121,6 +138,8 @@ public class EventoService {
         }
         return eventos;
     }
+
+
    
 
 }

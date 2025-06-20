@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import backend.backend_adprso.Entity.Evento.EventoEntity;
 import backend.backend_adprso.Entity.Evento.EventoUsuarioEntity;
 import backend.backend_adprso.Entity.Usuario.UsuarioEntity;
 
@@ -19,4 +20,10 @@ public interface EventoUsuarioRepository extends JpaRepository<EventoUsuarioEnti
 
     @Query("SELECT eu FROM EventoUsuarioEntity eu WHERE eu.usuario = :usuario")
     List<EventoUsuarioEntity> findByUsuario(@Param("usuario") UsuarioEntity usuario);
+
+    @Query("SELECT eu FROM EventoUsuarioEntity eu WHERE eu.evento.even_id = :eventoId")
+    List<EventoUsuarioEntity> findByEventoEvenId(@Param("eventoId") Long eventoId);
+
+     @Query("SELECT e FROM EventoEntity e WHERE e.even_estado = :estado")
+    List<EventoEntity> findEventosByEstado(@Param("estado") Integer estado);  
 }

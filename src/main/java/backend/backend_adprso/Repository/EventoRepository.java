@@ -13,4 +13,7 @@ import backend.backend_adprso.Entity.Evento.EventoEntity;
 public interface EventoRepository extends JpaRepository<EventoEntity, Long>{
     @Query(value = "SELECT * FROM evento e WHERE e.even_estado = :estado", nativeQuery = true)
     List<EventoEntity> findByEvenEstado(@Param("estado") Integer estado);
+
+    @Query("SELECT e FROM EventoEntity e WHERE LOWER(e.even_nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))")
+    List<EventoEntity> buscarPorNombre(String nombre);
 }

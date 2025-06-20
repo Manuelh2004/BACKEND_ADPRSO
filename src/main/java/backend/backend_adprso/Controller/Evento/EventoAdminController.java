@@ -3,9 +3,9 @@ package backend.backend_adprso.Controller.Evento;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import backend.backend_adprso.Controller.Response.ApiResponse;
 import backend.backend_adprso.Entity.Evento.EventoEntity;
+import backend.backend_adprso.Entity.Usuario.UsuarioEntity;
 import backend.backend_adprso.Service.Evento.EventoService;
 
 @RestController
@@ -74,4 +75,46 @@ public class EventoAdminController {
             );
         }
     }    
+    
+     @GetMapping("/{eventoId}/usuarios")
+    public ApiResponse<List<UsuarioEntity>> obtenerUsuariosPorEvento(@PathVariable Long eventoId) {
+        try {           
+            List<UsuarioEntity> usuarios = eventoService.obtenerUsuariosPorEvento(eventoId);        
+           
+            return new ApiResponse<>("success", HttpStatus.OK.value(), usuarios, "Usuarios obtenidos con éxito");
+        } catch (Exception e) {           
+            return new ApiResponse<>("error", HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Hubo un error al obtener los usuarios");
+        }
+    }
+
+    @GetMapping("/activos")
+    public ResponseEntity<ApiResponse<List<EventoEntity>>> listarEventosActivos() {
+        List<EventoEntity> evento = eventoService.ListarEventosActivos();
+        return ResponseEntity.ok(
+            new ApiResponse<>("success", 200, evento, null)
+        );
+    }
+    @GetMapping("/inactivos")
+    public ResponseEntity<ApiResponse<List<EventoEntity>>> listarEventosInactivos() {
+        List<EventoEntity> evento = eventoService.listarEventosInactivos();
+        return ResponseEntity.ok(
+            new ApiResponse<>("success", 200, evento, null)
+        );
+    }
+
+    @GetMapping("/buscar")
+    public ApiResponse<List<EventoEntity>> buscarEventosPorNombre(@RequestParam String nombre) {
+        List<EventoEntity> eventos = eventoService.buscarPorNombre(nombre);
+
+        if (eventos.isEmpty()) {
+            return new ApiResponse<>(
+                "ERROR", HttpStatus.NOT_FOUND.value(),
+                null, "No se encontraron eventos con ese nombre."
+            );
+        }
+        return new ApiResponse<>(
+            "SUCCESS", HttpStatus.OK.value(),
+            eventos, "Eventos encontrados exitosamente."
+        );
+    }
 }
