@@ -8,13 +8,11 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import backend.backend_adprso.Entity.Adopcion.AdopcionEntity;
 import backend.backend_adprso.Entity.Evento.EventoEntity;
 import backend.backend_adprso.Entity.Evento.EventoUsuarioEntity;
 import backend.backend_adprso.Entity.Usuario.UsuarioEntity;
 import backend.backend_adprso.Repository.EventoRepository;
 import backend.backend_adprso.Repository.EventoUsuarioRepository;
-import backend.backend_adprso.Repository.UsuarioRepository;
 import backend.backend_adprso.Service.Usuario.UsuarioService;
 import jakarta.transaction.Transactional;
 
@@ -24,8 +22,6 @@ public class EventoService {
     EventoRepository eventoRepository;
     @Autowired
     private EventoUsuarioRepository eventoUsuarioRepository;
-    @Autowired
-    private UsuarioRepository usuarioRepository;
     @Autowired
     private UsuarioService usuarioService;
 
