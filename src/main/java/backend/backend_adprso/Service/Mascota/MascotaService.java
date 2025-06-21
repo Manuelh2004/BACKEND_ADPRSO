@@ -150,29 +150,68 @@ public class MascotaService {
     }
    
     @Transactional
-    public Optional<MascotaEntity> actualizarMascota(Long id, MascotaEntity mascotaActualizada, List<Long> nuevosGustosIds, List<String> nuevasImagenUrls) {
-        Optional<MascotaEntity> mascotaOpt = mascotaRepository.findById(id);
-        if (mascotaOpt.isPresent()) {
-            MascotaEntity mascotaExistente = mascotaOpt.get();
-            
-            mascotaExistente.setMasc_nombre(mascotaActualizada.getMasc_nombre());
-            mascotaExistente.setMasc_fecha_nacimiento(mascotaActualizada.getMasc_fecha_nacimiento());
-            mascotaExistente.setMasc_historia(mascotaActualizada.getMasc_historia());
-            mascotaExistente.setMasc_observacion(mascotaActualizada.getMasc_observacion());
-            mascotaExistente.setMasc_estado(mascotaActualizada.getMasc_estado());
-            mascotaExistente.setSexo(mascotaActualizada.getSexo());
-            mascotaExistente.setTamanio(mascotaActualizada.getTamanio());
-            mascotaExistente.setNivel_energia(mascotaActualizada.getNivel_energia());
-            mascotaExistente.setTipo_mascota(mascotaActualizada.getTipo_mascota());
-            mascotaExistente.setEstado_salud(mascotaActualizada.getEstado_salud());
-            mascotaExistente.setEstado_vacuna(mascotaActualizada.getEstado_vacuna());
-         
-            MascotaEntity mascotaGuardada = mascotaRepository.save(mascotaExistente);          
+    public MascotaEntity updateMascota(Long id, MascotaEntity mascotaDetails, List<String> updatedImagenes, List<Long> updatedGustos) {
+        // Buscar la mascota por su ID
+        Optional<MascotaEntity> existingMascotaOpt = mascotaRepository.findById(id);
 
-            return Optional.of(mascotaGuardada);
+        if (existingMascotaOpt.isPresent()) {
+            MascotaEntity existingMascota = existingMascotaOpt.get();
+
+            // Actualizamos los campos de la mascota
+            existingMascota.setMasc_nombre(mascotaDetails.getMasc_nombre());
+            existingMascota.setMasc_fecha_nacimiento(mascotaDetails.getMasc_fecha_nacimiento());
+            existingMascota.setMasc_fecha_registro(mascotaDetails.getMasc_fecha_registro());
+            existingMascota.setMasc_historia(mascotaDetails.getMasc_historia());
+            existingMascota.setMasc_observacion(mascotaDetails.getMasc_observacion());
+            existingMascota.setMasc_estado(mascotaDetails.getMasc_estado());
+
+            // Actualizamos las relaciones
+            existingMascota.setSexo(mascotaDetails.getSexo());
+            existingMascota.setTamanio(mascotaDetails.getTamanio());
+            existingMascota.setNivel_energia(mascotaDetails.getNivel_energia());
+            existingMascota.setTipo_mascota(mascotaDetails.getTipo_mascota());
+            existingMascota.setEstado_salud(mascotaDetails.getEstado_salud());
+            existingMascota.setEstado_vacuna(mascotaDetails.getEstado_vacuna());
+
+            // Guardamos la mascota actualizada
+            MascotaEntity updatedMascota = mascotaRepository.save(existingMascota);
+
+            // 1. Eliminar las imágenes existentes de la mascota antes de agregar las nuevas
+            if (updatedImagenes != null && !updatedImagenes.isEmpty()) {
+                System.out.println("Eliminando imágenes asociadas a la mascota con ID: " + id);
+                imagenRepository.deleteByMascotaId(id);  // Elimina todas las imágenes asociadas a la mascota
+                // Añadimos las nuevas imágenes
+                for (String imagenUrl : updatedImagenes) {
+                    ImagenEntity imagen = new ImagenEntity();
+                    imagen.setMascota(updatedMascota);  // Asociamos la imagen con la mascota actualizada
+                    imagen.setIma_url(imagenUrl);  // Usamos la URL proporcionada
+                    imagenRepository.save(imagen);
+                }
+            }
+
+            // 2. Eliminar los gustos existentes de la mascota antes de agregar los nuevos
+            if (updatedGustos != null && !updatedGustos.isEmpty()) {
+                gustoMascotaRepository.deleteByMascotaId(id);  // Elimina todos los gustos asociados a la mascota
+                // Añadimos los nuevos gustos
+                for (Long gustoId : updatedGustos) {
+                    GustoEntity gustoEntity = gustoRepository.findByGust_id(gustoId);  // Obtenemos el GustoEntity por ID
+                    if (gustoEntity != null) {
+                        GustoMascotaEntity gustoMascota = new GustoMascotaEntity();
+                        gustoMascota.setMasc_id(updatedMascota);  // Asociamos el gusto con la mascota actualizada
+                        gustoMascota.setGust_id(gustoEntity);  // Asignamos el gusto encontrado
+                        gustoMascotaRepository.save(gustoMascota);
+                    }
+                }
+            }
+
+            return updatedMascota;
+        } else {
+            // Si no existe una mascota con ese ID, lanzar excepción o devolver null
+            throw new RuntimeException("Mascota no encontrada con el ID: " + id);
         }
-        return Optional.empty();
     }
+
+
 
     @Transactional
     public MascotaEntity cambiarEstadoMascota(Long evenId, Integer nuevoEstado) {

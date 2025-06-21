@@ -3,8 +3,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import backend.backend_adprso.Entity.Items.TipoUsuarioEntity;

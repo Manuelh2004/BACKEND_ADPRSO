@@ -42,28 +42,18 @@ public class MascotaAdminController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<MascotaEntity>> actualizarMascota(
-            @PathVariable Long id,
-            @RequestBody MascotaEntity mascotaActualizada,
-            @RequestParam(required = false) List<Long> nuevosGustosIds,
-            @RequestParam(required = false) List<String> nuevasImagenUrls) {
-
-        Optional<MascotaEntity> mascotaOpt = mascotaService.actualizarMascota(id, mascotaActualizada, nuevosGustosIds, nuevasImagenUrls);
-
-        if (mascotaOpt.isPresent()) {
-            MascotaEntity mascotaGuardada = mascotaOpt.get();
-            ApiResponse<MascotaEntity> response = new ApiResponse<>(
-                    "success", 200, mascotaGuardada, "Mascota actualizada correctamente"
-            );
-            return ResponseEntity.ok(response);
-        } else {
-            ApiResponse<MascotaEntity> response = new ApiResponse<>(
-                    "error", 404, null, "Mascota no encontrada"
-            );
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+   @PutMapping("/{id}")
+    public ResponseEntity<MascotaEntity> updateMascota(@PathVariable Long id, @RequestBody MascotaUpdateRequest request) {
+        try {
+            // Llamamos al servicio pasando el ID de la mascota, los detalles y los nuevos gustos/imágenes
+            MascotaEntity updatedMascota = mascotaService.updateMascota(id, request.getMascota(), request.getImagenUrls(), request.getNewGustos());
+            return new ResponseEntity<>(updatedMascota, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            // En caso de que no se encuentre la mascota o algún error en el proceso
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
 
     @PutMapping("/{id}/estado")
     public ResponseEntity<ApiResponse<MascotaEntity>> cambiarEstado(

@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import backend.backend_adprso.Entity.Items.ImagenEntity;
+import jakarta.transaction.Transactional;
 
 @Repository
 public interface ImagenRepository extends JpaRepository<ImagenEntity, Long>{
@@ -16,6 +17,8 @@ public interface ImagenRepository extends JpaRepository<ImagenEntity, Long>{
     List<ImagenEntity> findByMascotaId(@Param("mascId") Long mascId);
 
     @Modifying
-    @Query("DELETE FROM GustoMascotaEntity gm WHERE gm.masc_id.masc_id = :mascId")
-    void deleteByMascotaId(Long mascId);
+    @Transactional
+    @Query("DELETE FROM ImagenEntity i WHERE i.mascota.masc_id = :mascId")
+    void deleteByMascotaId(@Param("mascId") Long mascId);  // Eliminar imágenes por mascota
+   
 }
