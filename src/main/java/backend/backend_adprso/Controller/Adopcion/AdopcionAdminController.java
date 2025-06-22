@@ -3,6 +3,7 @@ package backend.backend_adprso.Controller.Adopcion;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,13 +14,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import backend.backend_adprso.Controller.Response.ApiResponse;
 import backend.backend_adprso.Entity.Adopcion.AdopcionEntity;
+import backend.backend_adprso.Entity.Mascota.MascotaEntity;
 import backend.backend_adprso.Service.Adopcion.AdopcionService;
+import backend.backend_adprso.Service.Mascota.MascotaService;
 
 @RestController
 @RequestMapping("/admin/api/adopciones")
 public class AdopcionAdminController {
     @Autowired
     private AdopcionService adopcionService;
+    @Autowired
+    private MascotaService mascotaService; 
 
      // Método para obtener todas las adopciones
     @GetMapping("/listar_adopciones")
@@ -82,7 +87,17 @@ public class AdopcionAdminController {
         }
     }    
 
-
-
-
+     @GetMapping("/buscar")
+    public ApiResponse<List<MascotaEntity>> buscarMascotasPorNombre(@RequestParam String nombre) {
+        try {
+            List<MascotaEntity> mascotas = mascotaService.buscarPorNombre(nombre);
+            
+            if (mascotas.isEmpty()) {
+                return new ApiResponse<>("success", HttpStatus.OK.value(), null, "No se encontraron mascotas con ese nombre.");
+            }            
+            return new ApiResponse<>("success", HttpStatus.OK.value(), mascotas, "Mascotas encontradas.");
+        } catch (Exception e) {
+            return new ApiResponse<>("error", HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Hubo un error al procesar la solicitud.");
+        }
+    }
 }

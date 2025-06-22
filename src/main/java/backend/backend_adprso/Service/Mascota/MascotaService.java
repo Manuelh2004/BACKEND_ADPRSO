@@ -211,8 +211,6 @@ public class MascotaService {
         }
     }
 
-
-
     @Transactional
     public MascotaEntity cambiarEstadoMascota(Long evenId, Integer nuevoEstado) {
         Optional<MascotaEntity> mascotaExistente = mascotaRepository.findById(evenId);
@@ -225,6 +223,13 @@ public class MascotaService {
             return null; // Si el evento no existe, retorna null
         }
     }
+
+    @Transactional()
+    public List<MascotaEntity> buscarPorNombre(String nombre) {
+        return mascotaRepository.buscarPorNombre(nombre);
+    }
+
+
 
     // Filtros *****************************************************
     public List<MascotaEntity> filtrarPorSexo(Long sexId) {

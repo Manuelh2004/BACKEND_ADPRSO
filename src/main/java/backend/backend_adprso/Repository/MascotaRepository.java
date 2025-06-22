@@ -49,5 +49,8 @@ public interface MascotaRepository extends JpaRepository<MascotaEntity, Long> {
     List<MascotaEntity> findAllWithGustos();
 
    @Query("SELECT m FROM MascotaEntity m LEFT JOIN m.imagenes i WHERE m.masc_id = :mascotaId")
-    List<MascotaEntity> findMascotaWithImagenes(@Param("mascotaId") Long mascotaId);                          
+    List<MascotaEntity> findMascotaWithImagenes(@Param("mascotaId") Long mascotaId);   
+    
+    @Query("SELECT m FROM MascotaEntity m WHERE LOWER(m.masc_nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))")
+    List<MascotaEntity> buscarPorNombre(@Param("nombre") String nombre);
 }
