@@ -18,4 +18,6 @@ public interface AdopcionRepository extends JpaRepository<AdopcionEntity, Long>{
 
     @Query(value = "SELECT * FROM adopcion e WHERE e.adop_estado = :estado", nativeQuery = true)
     List<AdopcionEntity> findByEvenEstado(@Param("estado") Integer estado);
+
+    List<AdopcionEntity> findByUsuario(UsuarioEntity usuario);
 }   

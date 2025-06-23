@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import backend.backend_adprso.Entity.Adopcion.AdopcionRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,19 +27,22 @@ public class AdopcionService {
     @Autowired
     private MascotaRepository mascotaRepository; 
 
-    public void guardarAdopcion(AdopcionEntity adopcionEntity, String token) {
+    public void guardarAdopcion(AdopcionRequestDTO adopcionRequestDTO, String token) {
         UsuarioEntity usuarioLogueado = usuarioService.obtenerUsuarioLogueado(token);
 
-        boolean existeAdopcion = adopcionRepository.existsByUsuarioAndMascota(usuarioLogueado, adopcionEntity.getMascota());
+        boolean existeAdopcion = adopcionRepository.existsByUsuarioAndMascota(usuarioLogueado, adopcionRequestDTO.getMascota());
         if (existeAdopcion) {
             throw new RuntimeException("El usuario ya ha adoptado esta mascota");
         }
 
-        MascotaEntity mascota = mascotaRepository.findById(adopcionEntity.getMascota().getMasc_id())
+        MascotaEntity mascota = mascotaRepository.findById(adopcionRequestDTO.getMascota().getMasc_id())
                 .orElseThrow(() -> new RuntimeException("Mascota no encontrada"));
 
+        AdopcionEntity adopcionEntity = new AdopcionEntity();
+        adopcionEntity.setMascota(mascota);
+        adopcionEntity.setAdop_motivo(adopcionRequestDTO.getAdop_motivo());
         adopcionEntity.setUsuario(usuarioLogueado);
-        adopcionEntity.setAdop_estado(1); 
+        adopcionEntity.setAdop_estado(0);
         adopcionEntity.setAdop_fecha(LocalDate.now());
 
         adopcionRepository.save(adopcionEntity);
@@ -80,6 +84,10 @@ public class AdopcionService {
     }
 
 
+    public List<AdopcionEntity> listarAdopcionesDelUsuario(String token) {
+        UsuarioEntity usuarioLogueado = usuarioService.obtenerUsuarioLogueado(token);
+        return adopcionRepository.findByUsuario(usuarioLogueado);
+    }
 
 
 
