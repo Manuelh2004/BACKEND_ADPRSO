@@ -3,6 +3,7 @@ package backend.backend_adprso.Service.AuthService;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import backend.backend_adprso.Entity.Items.TipoUsuarioEntity;
@@ -22,15 +23,25 @@ public class AuthService {
     private TipoUsuarioRepository tipoUsuarioRepository; 
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public String login(String email, String password) {
-        Optional<UsuarioEntity> usuario = usuarioRepository.findByUsrEmail(email);
-        if (usuario.isPresent() && usuario.get().getUsr_password().equals(password)) {
-            String role = usuario.get().getTipoUsuario().getTipus_nombre();
-            return jwtUtil.generateToken(email, role);
-        } else {
-            throw new RuntimeException("Credenciales inválidas");
+        Optional<UsuarioEntity> usuarioOpt = usuarioRepository.findByUsrEmail(email);
+
+        if (usuarioOpt.isPresent()) {
+            UsuarioEntity usuario = usuarioOpt.get();
+            String hashedPassword = usuario.getUsr_password(); // contraseña en la BD
+
+            // Compara usando BCrypt
+            if (passwordEncoder.matches(password, hashedPassword)) {
+                String role = usuario.getTipoUsuario().getTipus_nombre();
+                return jwtUtil.generateToken(email, role);
+            }
         }
+
+        throw new RuntimeException("Credenciales inválidas");
+  
     }
 
     public String register(UsuarioEntity usuario) {
@@ -39,6 +50,10 @@ public class AuthService {
         if (existingUser.isPresent()) {
             throw new RuntimeException("El correo electrónico ya está registrado.");
         }
+
+        // Encriptar la contraseña antes de guardar
+        String hashedPassword = passwordEncoder.encode(usuario.getUsr_password());
+        usuario.setUsr_password(hashedPassword);
 
         // Obtener el tipo de usuario y asignarlo
         TipoUsuarioEntity tipoUsuario = tipoUsuarioRepository.findById(2L)
