@@ -87,7 +87,7 @@ public class AdopcionAdminController {
         }
     }    
 
-     @GetMapping("/buscar")
+    @GetMapping("/buscar")
     public ApiResponse<List<MascotaEntity>> buscarMascotasPorNombre(@RequestParam String nombre) {
         try {
             List<MascotaEntity> mascotas = mascotaService.buscarPorNombre(nombre);

@@ -9,6 +9,7 @@ import backend.backend_adprso.Entity.Mascota.MascotaDetalleDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import backend.backend_adprso.Entity.Evento.EventoEntity;
 import backend.backend_adprso.Entity.Items.GustoEntity;
 import backend.backend_adprso.Entity.Items.ImagenEntity;
 import backend.backend_adprso.Entity.Mascota.GustoMascotaEntity;
@@ -41,10 +42,9 @@ public class MascotaService {
        Optional<MascotaEntity> mascotaOpt = mascotaRepository.findById(id);
         if (mascotaOpt.isPresent()) {
             MascotaEntity mascota = mascotaOpt.get();
-            // Forzamos la carga de los gustos y las imágenes
-            mascota.getGustoNames();  // Carga los gustos asociados
-            List<ImagenEntity> imagenes = imagenRepository.findByMascotaId(id);  // Carga las imágenes
-            mascota.setImagenes(imagenes);  // Asocia las imágenes a la mascota
+            mascota.getGustoNames();  
+            List<ImagenEntity> imagenes = imagenRepository.findByMascotaId(id); 
+            mascota.setImagenes(imagenes); 
             return Optional.of(mascota);
         }
         return Optional.empty();
@@ -229,8 +229,9 @@ public class MascotaService {
         return mascotaRepository.buscarPorNombre(nombre);
     }
 
-
-
+    public List<MascotaEntity> listarMascotasInactivas() {
+        return mascotaRepository.findByMascEstado(0); 
+    } 
     // Filtros *****************************************************
     public List<MascotaEntity> filtrarPorSexo(Long sexId) {
         return mascotaRepository.findBySexo(sexId);
