@@ -1,6 +1,7 @@
 package backend.backend_adprso.Controller.Usuario;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,11 @@ import backend.backend_adprso.Service.Usuario.UsuarioService;
 public class UsuarioController {   
     @Autowired
     private UsuarioService usuarioService;    
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    public boolean verificarContraseña(String rawPassword, String storedPassword) {
+    return bCryptPasswordEncoder.matches(rawPassword, storedPassword);
+    }
 
     @PutMapping("/{id}")
     public ApiResponse<UsuarioEntity> actualizarUsuario(@PathVariable Long id, @RequestBody UsuarioEntity usuario) {

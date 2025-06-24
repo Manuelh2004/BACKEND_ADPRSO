@@ -38,6 +38,7 @@ public class AuthService {
         Optional<UsuarioEntity> existingUser = usuarioRepository.findByUsrEmail(usuario.getUsr_email());
         if (existingUser.isPresent()) {
             throw new RuntimeException("El correo electrónico ya está registrado.");
+
         }
 
         // Obtener el tipo de usuario y asignarlo
@@ -45,9 +46,8 @@ public class AuthService {
             .orElseThrow(() -> new RuntimeException("Tipo de usuario no encontrado"));
         usuario.setTipoUsuario(tipoUsuario);
 
-        if (usuario.getUsr_email() == null) {
-            usuario.setUsr_estado("activo");  
-        }
+        usuario.setUsr_estado("activo");  
+       
 
         usuarioRepository.save(usuario);
 

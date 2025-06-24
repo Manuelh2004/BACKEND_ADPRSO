@@ -1,0 +1,27 @@
+2025-06-23T23:19:14.215-05:00 ERROR 12920 --- [restartedMain] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Failed to bind properties under 'logging.level.com.example' to org.springframework.boot.logging.LogLevel:
+
+    Property: logging.level.com.example
+    Value: "DEBUG  # Cambia 'com.example' por el paquete de tu aplicaciÃ³n"
+    Origin: class path resource [application.properties] - 47:27
+    Reason: failed to convert java.lang.String to org.springframework.boot.logging.LogLevel (caused by java.lang.IllegalArgumentException: No enum constant org.springframework.boot.logging.LogLevel.DEBUG  # Cambia 'com.example' por el paquete de tu aplicaciÃ³n)
+
+Action:
+
+Update your application's configuration. The following values are valid:
+
+    DEBUG
+    ERROR
+    FATAL
+    INFO
+    OFF
+    TRACE
+    WARN
+
