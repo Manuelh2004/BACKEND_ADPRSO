@@ -160,10 +160,8 @@ public class MascotaService {
             // Actualizamos los campos de la mascota
             existingMascota.setMasc_nombre(mascotaDetails.getMasc_nombre());
             existingMascota.setMasc_fecha_nacimiento(mascotaDetails.getMasc_fecha_nacimiento());
-            existingMascota.setMasc_fecha_registro(mascotaDetails.getMasc_fecha_registro());
             existingMascota.setMasc_historia(mascotaDetails.getMasc_historia());
             existingMascota.setMasc_observacion(mascotaDetails.getMasc_observacion());
-            existingMascota.setMasc_estado(mascotaDetails.getMasc_estado());
 
             // Actualizamos las relaciones
             existingMascota.setSexo(mascotaDetails.getSexo());
