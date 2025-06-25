@@ -63,6 +63,10 @@ public class ItemService {
         return tipoUsuarioRepository.findAll();
     }
 
+    public List<TipoDocumentoEntity> ListarTipoDocumento() {
+        return tipoDocumentoRepository.findAll();
+    }
+
     public List<SexoEntity> ListarSexo() {
         return sexoRepository.findAll();
     }

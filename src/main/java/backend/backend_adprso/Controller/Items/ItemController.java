@@ -60,6 +60,13 @@ public class ItemController {
         return ResponseEntity.ok(new ApiResponse<>("success", 200, lista, mensaje));
     }
 
+    @GetMapping("/tipo-documento/public")
+    public ResponseEntity<ApiResponse<List<TipoDocumentoEntity>>> listarTipoDocumento() {
+        List<TipoDocumentoEntity> lista = itemService.ListarTipoDocumento();
+        String mensaje = lista.isEmpty() ? "No se encontraron tipos de usuario" : null;
+        return ResponseEntity.ok(new ApiResponse<>("success", 200, lista, mensaje));
+    }
+
     @GetMapping("/tipo_mascota/public")
     public ResponseEntity<ApiResponse<List<TipoMascotaEntity>>> listarTipoMascota() {
         List<TipoMascotaEntity> lista = itemService.ListarTipoMascota();
