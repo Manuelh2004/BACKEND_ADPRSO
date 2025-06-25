@@ -1,6 +1,8 @@
 package backend.backend_adprso.Entity.Usuario;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import backend.backend_adprso.Entity.Items.TipoDocumentoEntity;
 import backend.backend_adprso.Entity.Items.TipoUsuarioEntity;
 import jakarta.persistence.Column;
@@ -49,6 +51,15 @@ public class UsuarioEntity {
     @ManyToOne
     @JoinColumn(name = "tipus_id", nullable = false)
     private TipoUsuarioEntity tipoUsuario;
+
+    @Column(name = "codigo_verificacion")
+    private Integer codigoVerificacion;
+
+    @Column(name = "verificado")
+    private boolean verificado = false;
+
+    @Column(name = "codigo_recuperacion")
+    private String codigoRecuperacion;
 
     // Método para obtener el rol del tipoUsuario
     public String getRol() {

@@ -33,7 +33,8 @@ public class AuthController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             // Si hay un error en el login, devolvemos un mensaje adecuado
-            ApiResponse<String> response = new ApiResponse<>("error", HttpStatus.UNAUTHORIZED.value(), null, "Credenciales inválidas");
+            String mensaje = e.getMessage();
+            ApiResponse<String> response = new ApiResponse<>("error", HttpStatus.UNAUTHORIZED.value(), null, mensaje);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
     }
@@ -56,4 +57,42 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
+
+    @PostMapping("/verificar")
+    public ResponseEntity<ApiResponse<?>> verificarCuenta(@RequestBody VerificarRequest verificarRequest) {
+        try {
+            String mensaje = authService.verificarCuenta(verificarRequest);
+
+            ApiResponse<String> response = new ApiResponse<>("success", HttpStatus.OK.value(), null, mensaje);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            ApiResponse<String> response = new ApiResponse<>("error", HttpStatus.BAD_REQUEST.value(), null, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+    @PostMapping("/recuperar")
+    public ResponseEntity<ApiResponse<?>> iniciarRecuperacion(@RequestBody String email) {
+        try {
+            String mensaje = authService.iniciarRecuperacionPassword(email);
+
+            ApiResponse<String> response = new ApiResponse<>("success", HttpStatus.OK.value(), null, mensaje);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            ApiResponse<String> response = new ApiResponse<>("error", HttpStatus.BAD_REQUEST.value(), null, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+    @PostMapping("/restablecer")
+    public ResponseEntity<ApiResponse<?>> restablecerPassword(@RequestBody RestablecerRequest restablecerRequest) {
+        try {
+            String mensaje = authService.restablecerPassword(restablecerRequest);
+
+            ApiResponse<String> response = new ApiResponse<>("success", HttpStatus.OK.value(), null, mensaje);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            ApiResponse<String> response = new ApiResponse<>("error", HttpStatus.BAD_REQUEST.value(), null, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
 }
