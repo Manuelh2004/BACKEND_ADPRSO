@@ -1,7 +1,11 @@
 package backend.backend_adprso.Service.Usuario;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import backend.backend_adprso.Entity.Adopcion.AdopcionEntity;
+import backend.backend_adprso.Entity.Adopcion.AdopcionRequestDTO;
+import backend.backend_adprso.Entity.Mascota.MascotaEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,11 +40,13 @@ public class UsuarioService {
         return usuarioRepository.save(usuario);
     }
 
-    public UsuarioEntity actualizarUsuario(Long id, UsuarioEntity usuario) {
-        if (usuarioRepository.existsById(id)) {
-            usuario.setUsr_id(id); 
-            return usuarioRepository.save(usuario);
-        }
+    public UsuarioEntity actualizarUsuario( String token, UsuarioEntity usuario) {
+        UsuarioEntity usuarioLogueado = obtenerUsuarioLogueado(token);
+        usuarioLogueado.setUsr_telefono(usuario.getUsr_telefono());
+        usuarioLogueado.setUsr_nombre(usuario.getUsr_nombre());
+        usuarioLogueado.setUsr_direccion(usuario.getUsr_direccion());
+        usuarioLogueado.setUsr_apellido(usuario.getUsr_apellido());
+        usuarioRepository.save(usuarioLogueado);
         return null;
     }
 
@@ -66,5 +72,14 @@ public class UsuarioService {
         String username = jwtUtil.extractUsername(token);
         return usuarioRepository.findByUsrEmail(username)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    }
+
+    // Método privado para validar token y extraerlo limpio
+    public String extraerYValidarToken(String authorizationHeader) {
+        String token = authorizationHeader.replace("Bearer ", "");
+        if (!jwtUtil.validateToken(token)) {
+            throw new RuntimeException("Token no válido");
+        }
+        return token;
     }
 }

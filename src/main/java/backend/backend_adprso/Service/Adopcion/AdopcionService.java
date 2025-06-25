@@ -32,7 +32,7 @@ public class AdopcionService {
 
         boolean existeAdopcion = adopcionRepository.existsByUsuarioAndMascota(usuarioLogueado, adopcionRequestDTO.getMascota());
         if (existeAdopcion) {
-            throw new RuntimeException("El usuario ya ha adoptado esta mascota");
+            throw new RuntimeException("El usuario ya ha enviado su solicitud de adopción para esta mascota");
         }
 
         MascotaEntity mascota = mascotaRepository.findById(adopcionRequestDTO.getMascota().getMasc_id())
