@@ -18,6 +18,8 @@ import backend.backend_adprso.Controller.Response.ApiResponse;
 import backend.backend_adprso.Entity.Evento.EventoEntity;
 import backend.backend_adprso.Entity.Usuario.UsuarioEntity;
 import backend.backend_adprso.Service.Evento.EventoService;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/admin/api/evento")
@@ -116,5 +118,20 @@ public class EventoAdminController {
             "SUCCESS", HttpStatus.OK.value(),
             eventos, "Eventos encontrados exitosamente."
         );
+    }
+
+    @PostMapping("/reporte-inscripciones")
+    public ResponseEntity<byte[]> descargarReporteFiltrado(@RequestBody List<Long> idsEvento) {
+        try {
+            byte[] contenido = eventoService.generarReporteInscripciones(idsEvento);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentDisposition(ContentDisposition.attachment().filename("reporte_inscripciones.xlsx").build());
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+
+            return new ResponseEntity<>(contenido, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 }
