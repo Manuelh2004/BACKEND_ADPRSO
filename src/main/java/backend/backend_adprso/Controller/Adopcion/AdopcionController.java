@@ -1,7 +1,6 @@
 package backend.backend_adprso.Controller.Adopcion;
 
 import backend.backend_adprso.Entity.Adopcion.AdopcionRequestDTO;
-import backend.backend_adprso.Entity.Evento.EventoEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import backend.backend_adprso.Controller.Response.ApiResponse;
 import backend.backend_adprso.Entity.Adopcion.AdopcionEntity;
-import backend.backend_adprso.Entity.Mascota.MascotaEntity;
 import backend.backend_adprso.Service.Adopcion.AdopcionService;
 import backend.backend_adprso.Service.AuthService.JwtUtil;
-
 import java.util.List;
 
 @RestController
