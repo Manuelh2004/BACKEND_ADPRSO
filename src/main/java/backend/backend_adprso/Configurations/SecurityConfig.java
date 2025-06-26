@@ -31,10 +31,6 @@ public class SecurityConfig {
     public EndsWithUserRequestMatcher endsWithUserRequestMatcher() {
         return new EndsWithUserRequestMatcher(); 
     }
-     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();  // Retorna una instancia de BCryptPasswordEncoder
-    }
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
          http.cors(cors -> cors.configurationSource(request -> {

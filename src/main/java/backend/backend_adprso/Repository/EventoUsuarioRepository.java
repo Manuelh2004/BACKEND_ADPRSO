@@ -25,5 +25,7 @@ public interface EventoUsuarioRepository extends JpaRepository<EventoUsuarioEnti
     List<EventoUsuarioEntity> findByEventoEvenId(@Param("eventoId") Long eventoId);
 
      @Query("SELECT e FROM EventoEntity e WHERE e.even_estado = :estado")
-    List<EventoEntity> findEventosByEstado(@Param("estado") Integer estado);  
+    List<EventoEntity> findEventosByEstado(@Param("estado") Integer estado);
+    @Query("SELECT eu.usuario FROM EventoUsuarioEntity eu WHERE eu.evento.even_id = :eventoId")
+    List<UsuarioEntity> findUsuariosByEventoId(@Param("eventoId") Long eventoId);
 }

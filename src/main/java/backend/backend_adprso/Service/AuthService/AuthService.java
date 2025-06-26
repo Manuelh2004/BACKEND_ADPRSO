@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import backend.backend_adprso.Entity.Items.TipoUsuarioEntity;
@@ -26,9 +27,28 @@ public class AuthService {
     private TipoUsuarioRepository tipoUsuarioRepository; 
     @Autowired
     private EmailService emailService;
-
     @Autowired
     private PasswordResetTokenRepository passwordResetTokenRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    
+    public String login(String email, String password) {
+        Optional<UsuarioEntity> usuarioOpt = usuarioRepository.findByUsrEmail(email);
+
+        if (usuarioOpt.isPresent()) {
+            UsuarioEntity usuario = usuarioOpt.get();
+            String hashedPassword = usuario.getUsr_password(); // contraseña en la BD
+
+            // Compara usando BCrypt
+            if (passwordEncoder.matches(password, hashedPassword)) {
+                String role = usuario.getTipoUsuario().getTipus_nombre();
+                return jwtUtil.generateToken(email, role);
+            }
+        }
+
+        throw new RuntimeException("Credenciales inválidas");
+
+    }
 
     // Método para solicitar la recuperación de contraseña
     public void forgotPassword(String email) {
@@ -101,31 +121,25 @@ public class AuthService {
     usuarioRepository.save(usuario);
     }
 
-    public String login(String email, String password) {
-        Optional<UsuarioEntity> usuario = usuarioRepository.findByUsrEmail(email);
-        if (usuario.isPresent() && usuario.get().getUsr_password().equals(password)) {
-            String role = usuario.get().getTipoUsuario().getTipus_nombre();
-            return jwtUtil.generateToken(email, role);
-        } else {
-            throw new RuntimeException("Credenciales inválidas");
-        }
-    }
-
     public String register(UsuarioEntity usuario) {
         // Verificar si el usuario ya existe
         Optional<UsuarioEntity> existingUser = usuarioRepository.findByUsrEmail(usuario.getUsr_email());
         if (existingUser.isPresent()) {
             throw new RuntimeException("El correo electrónico ya está registrado.");
-
         }
+
+        // Encriptar la contraseña antes de guardar
+        String hashedPassword = passwordEncoder.encode(usuario.getUsr_password());
+        usuario.setUsr_password(hashedPassword);
 
         // Obtener el tipo de usuario y asignarlo
         TipoUsuarioEntity tipoUsuario = tipoUsuarioRepository.findById(2L)
             .orElseThrow(() -> new RuntimeException("Tipo de usuario no encontrado"));
         usuario.setTipoUsuario(tipoUsuario);
 
-        usuario.setUsr_estado("activo");  
-       
+        if (usuario.getUsr_email() == null) {
+            usuario.setUsr_estado("activo");
+        }
 
         usuarioRepository.save(usuario);
 
@@ -137,12 +151,12 @@ public class AuthService {
             String subject = "¡Bienvenido al Sistema!";
             String body = "<h1>¡Bienvenido, " + usuario.getUsr_email() + "!</h1>" +
                         "<p>Gracias por registrarte en nuestro sistema. Estamos felices de tenerte como parte de nuestra comunidad.</p>" +
-                        "<p>Tu token de acceso es: " + token + "</p>";  
+                        "<p>Tu token de acceso es: " + token + "</p>";
             emailService.sendEmail(usuario.getUsr_email(), subject, body);
         } catch (MessagingException e) {
             throw new RuntimeException("Error al enviar el correo electrónico de bienvenida", e);
         }
 
-        return token;  
+        return token;
     }
 }

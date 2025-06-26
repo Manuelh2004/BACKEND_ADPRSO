@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import backend.backend_adprso.Controller.Response.ApiResponse;
+import backend.backend_adprso.Entity.Evento.EventoEntity;
 import backend.backend_adprso.Entity.Mascota.MascotaConGustosDTO;
 import backend.backend_adprso.Entity.Mascota.MascotaEntity;
 import backend.backend_adprso.Service.Mascota.MascotaService;
@@ -53,7 +54,6 @@ public class MascotaAdminController {
         }
     }
 
-
     @PutMapping("/{id}/estado")
     public ResponseEntity<ApiResponse<MascotaEntity>> cambiarEstado(
         @PathVariable Long id, 
@@ -70,5 +70,34 @@ public class MascotaAdminController {
                 new ApiResponse<>("error", 404, null, "Evento no encontrado")
             );
         }
-    }    
+    }  
+
+    @GetMapping("/buscar")
+    public ApiResponse<List<MascotaEntity>> buscarMascotasPorNombre(@RequestParam String nombre) {
+        try {
+            List<MascotaEntity> mascotas = mascotaService.buscarPorNombre(nombre);
+            
+            if (mascotas.isEmpty()) {
+                return new ApiResponse<>("success", HttpStatus.OK.value(), null, "No se encontraron mascotas con ese nombre.");
+            }            
+            return new ApiResponse<>("success", HttpStatus.OK.value(), mascotas, "Mascotas encontradas.");
+        } catch (Exception e) {
+            return new ApiResponse<>("error", HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Hubo un error al procesar la solicitud.");
+        }
+    }
+
+    @GetMapping("/activos")
+    public ResponseEntity<ApiResponse<List<MascotaEntity>>> listarEventosActivos() {
+        List<MascotaEntity> mascota = mascotaService.ListarMascotasActivas();
+        return ResponseEntity.ok(
+            new ApiResponse<>("success", 200, mascota, null)
+        );
+    }
+    @GetMapping("/inactivos")
+    public ResponseEntity<ApiResponse<List<MascotaEntity>>> listarEventosInactivos() {
+        List<MascotaEntity> mascota = mascotaService.listarMascotasInactivas();
+        return ResponseEntity.ok(
+            new ApiResponse<>("success", 200, mascota, null)
+        );
+    }
 }
