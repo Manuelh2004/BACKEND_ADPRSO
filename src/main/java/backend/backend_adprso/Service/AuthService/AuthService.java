@@ -74,7 +74,7 @@ public class AuthService {
         passwordResetTokenRepository.save(passwordResetTokenEntity);
 
         // Enviar correo con el token
-        String resetLink = "http://localhost:8080/auth/reset_password?token=" + token;
+        String resetLink = "http://localhost:5173/reset-password?token=" + token;
         try {
             String subject = "Recuperación de Contraseña";
             String body = "<h1>Recuperación de Contraseña</h1>" +
