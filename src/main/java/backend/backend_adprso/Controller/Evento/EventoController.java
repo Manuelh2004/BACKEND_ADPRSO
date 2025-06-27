@@ -69,7 +69,7 @@ public class EventoController {
     }
 
     /* Listar los eventos asociado a un usuario */
-    @GetMapping("/mis_eventos")
+    @GetMapping("/mis-eventos")
     public ResponseEntity<ApiResponse<List<EventoEntity>>> listarEventosDelUsuario(@RequestHeader("Authorization") String authorizationHeader) {
         try {
             // Extraer el token del encabezado Authorization

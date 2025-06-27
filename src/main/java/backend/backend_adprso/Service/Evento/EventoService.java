@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import backend.backend_adprso.Entity.Adopcion.AdopcionEntity;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
@@ -29,8 +30,10 @@ import java.io.IOException;
 public class EventoService {
     @Autowired
     EventoRepository eventoRepository;
+
     @Autowired
     private EventoUsuarioRepository eventoUsuarioRepository;
+
     @Autowired
     private UsuarioService usuarioService;
 
