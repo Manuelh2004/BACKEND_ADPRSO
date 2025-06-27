@@ -1,14 +1,15 @@
 package backend.backend_adprso.Controller.Mascota;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.http.HttpHeaders;
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,12 +20,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 
 import backend.backend_adprso.Controller.Response.ApiResponse;
-import backend.backend_adprso.Entity.Evento.EventoEntity;
 import backend.backend_adprso.Entity.Mascota.MascotaConGustosDTO;
 import backend.backend_adprso.Entity.Mascota.MascotaEntity;
 import backend.backend_adprso.Service.Mascota.MascotaService;
+
 
 @RestController
 @RequestMapping("/admin/api/mascota")
@@ -107,36 +110,18 @@ public class MascotaAdminController {
             new ApiResponse<>("success", 200, mascota, null)
         );
     }
-    /*
 
-     @GetMapping("/descargarExcel")
-    public ResponseEntity<?> descargarExcelMascotas() {
-        try {
-            // Llamar al servicio para generar el archivo Excel
-            mascotaService.generarExcelMascotas();
+     @GetMapping("/exportar-excel")
+    public ResponseEntity<ByteArrayResource> exportarExcel() throws IOException {
+        // Generar el archivo Excel
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        mascotaService.generarExcelMascotas(outputStream);
+        ByteArrayResource resource = new ByteArrayResource(outputStream.toByteArray());
 
-            // Crear el archivo para enviarlo
-            File file = new File("mascotas.xlsx");
-
-            // Verificar si el archivo existe
-            if (!file.exists()) {
-                return new ResponseEntity<>("El archivo no se pudo generar", HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-
-            // Configurar los encabezados HTTP para la respuesta
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Content-Disposition", "attachment; filename=mascotas.xlsx");
-
-            // Leer el archivo como flujo de entrada
-            FileInputStream fileInputStream = new FileInputStream(file);
-
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .body(fileInputStream);
-        } catch (IOException e) {
-            return new ResponseEntity<>("Error al generar el archivo Excel", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-     */
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=mascotas.xlsx")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .contentLength(resource.contentLength())
+                .body(resource);
+    }    
 }

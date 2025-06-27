@@ -1,5 +1,6 @@
 package backend.backend_adprso.Service.Mascota;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -10,9 +11,7 @@ import org.apache.poi.ss.usermodel.*;
 
 import backend.backend_adprso.Entity.Mascota.MascotaDetalleDTO;
 
-
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,8 +28,6 @@ import backend.backend_adprso.Repository.ImagenRepository;
 import backend.backend_adprso.Repository.MascotaRepository;
 
 import jakarta.transaction.Transactional;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
 
 @Service
 public class MascotaService {
@@ -243,49 +240,98 @@ public class MascotaService {
     } 
 
     @Transactional
-    public void generarExcelMascotas() throws IOException {
+    public void generarExcelMascotas(ByteArrayOutputStream outputStream) throws IOException {
         List<MascotaEntity> mascotas = mascotaRepository.findAll();
 
-        // Crear un libro de trabajo de Excel
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Mascotas");
 
-        // Crear la fila de encabezado
+        CellStyle headerStyle = workbook.createCellStyle();
+        Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        headerFont.setColor(IndexedColors.WHITE.getIndex());
+        headerStyle.setFont(headerFont);
+
+        XSSFColor headerColor = new XSSFColor(new java.awt.Color(221, 161, 94), null); // Color #dda15e
+        headerStyle.setFillForegroundColor(headerColor);
+        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        headerStyle.setAlignment(HorizontalAlignment.CENTER);
+        headerStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+
+        CellStyle normalStyle = workbook.createCellStyle();
+        normalStyle.setBorderBottom(BorderStyle.THIN);
+        normalStyle.setBorderTop(BorderStyle.THIN);
+        normalStyle.setBorderLeft(BorderStyle.THIN);
+        normalStyle.setBorderRight(BorderStyle.THIN);
+        normalStyle.setAlignment(HorizontalAlignment.CENTER);
+        normalStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+
         Row headerRow = sheet.createRow(0);
-        String[] headers = {"ID", "Nombre", "Edad", "Especie", "Raza", "Gusto"};
+        String[] headers = {"#", "Nombre", "Edad", "Especie", "Sexo", "Gusto"};
         for (int i = 0; i < headers.length; i++) {
             Cell cell = headerRow.createCell(i);
             cell.setCellValue(headers[i]);
+            cell.setCellStyle(headerStyle); 
         }
 
-        // Llenar las filas con los datos de las mascotas
         int rowNum = 1;
         for (MascotaEntity mascota : mascotas) {
             Row row = sheet.createRow(rowNum++);
-            row.createCell(0).setCellValue(mascota.getMasc_id());
-            row.createCell(1).setCellValue(mascota.getMasc_nombre());
-            row.createCell(2).setCellValue(mascota.getMasc_fecha_nacimiento());
-            row.createCell(3).setCellValue(mascota.getTipo_mascota().getTipma_nombre());
-            row.createCell(4).setCellValue(mascota.getSexo().getSex_nombre());
 
-            // Si la entidad GustoEntity está relacionada, agregar el gusto de la mascota
+            Cell cell0 = row.createCell(0);
+            cell0.setCellValue(rowNum - 1); 
+            cell0.setCellStyle(normalStyle);
+
+            String nombre = (mascota.getMasc_nombre() != null) ? mascota.getMasc_nombre() : "Sin valores";
+            Cell cell1 = row.createCell(1);
+            cell1.setCellValue(nombre);
+            cell1.setCellStyle(normalStyle);
+
+            String fechaNacimiento = (mascota.getMasc_fecha_nacimiento() != null) ? mascota.getMasc_fecha_nacimiento().toString() : "Sin valores";
+            Cell cell2 = row.createCell(2);
+            cell2.setCellValue(fechaNacimiento); 
+            cell2.setCellStyle(normalStyle);
+
+            String especie = (mascota.getTipo_mascota() != null && mascota.getTipo_mascota().getTipma_nombre() != null)
+                    ? mascota.getTipo_mascota().getTipma_nombre() : "Sin valores";
+            Cell cell3 = row.createCell(3);
+            cell3.setCellValue(especie);
+            cell3.setCellStyle(normalStyle);
+
+            String sexo = (mascota.getSexo() != null && mascota.getSexo().getSex_nombre() != null)
+                    ? mascota.getSexo().getSex_nombre() : "Sin valores";
+            Cell cell4 = row.createCell(4);
+            cell4.setCellValue(sexo);
+            cell4.setCellStyle(normalStyle);
+
+            String gustos = "Sin valores";
             if (mascota.getGustoMascotaList() != null && !mascota.getGustoMascotaList().isEmpty()) {
-                StringBuilder gustos = new StringBuilder();
+                StringBuilder gustoBuilder = new StringBuilder();
                 for (GustoMascotaEntity gustoMascota : mascota.getGustoMascotaList()) {
-                    gustos.append(gustoMascota.getGust_id().getGust_nombre()).append(", ");
+                    gustoBuilder.append(gustoMascota.getGust_id().getGust_nombre()).append(", ");
                 }
-                row.createCell(5).setCellValue(gustos.toString().replaceAll(", $", ""));
+                gustos = gustoBuilder.toString().replaceAll(", $", "");
+            }
+            Cell cell5 = row.createCell(5);
+            cell5.setCellValue(gustos);
+            cell5.setCellStyle(normalStyle);
+        }
+
+        if (mascotas.isEmpty()) {
+            Row row = sheet.createRow(1);  
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = row.createCell(i);
+                cell.setCellStyle(normalStyle);
             }
         }
 
-        // Escribir el archivo Excel
-        try (FileOutputStream fileOut = new FileOutputStream("mascotas.xlsx")) {
-            workbook.write(fileOut);
+        for (int i = 0; i < headers.length; i++) {
+            sheet.autoSizeColumn(i);  
         }
 
-        // Cerrar el workbook
+        workbook.write(outputStream);
         workbook.close();
-    }
+    } 
 
     // Filtros *****************************************************
     public List<MascotaEntity> filtrarPorSexo(Long sexId) {
