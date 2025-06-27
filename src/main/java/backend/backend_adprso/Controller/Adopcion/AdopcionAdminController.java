@@ -105,9 +105,9 @@ public class AdopcionAdminController {
         AdopcionEntity adopcion = adopcionService.VolverAPendiente(adopId);
 
         if (adopcion != null) {
-            return ResponseEntity.ok(adopcion); // Devuelve la adopción actualizada
+            return ResponseEntity.ok(adopcion); 
         } else {
-            return ResponseEntity.notFound().build(); // Devuelve un 404 si no se encuentra la adopción
+            return ResponseEntity.notFound().build(); 
         }
     }
 }

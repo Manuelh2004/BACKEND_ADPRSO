@@ -81,29 +81,23 @@ public class AdopcionService {
             AdopcionEntity adopcion = adopcionExistente.get();
             MascotaEntity mascota = adopcion.getMascota(); 
 
-            // Si la adopción es Aceptada (1)
             if (nuevoEstado == 1) {
-                // Solo cambiamos el estado de la mascota si está activa (estado 1)
                 if (mascota.getMasc_estado() == 1) {
-                    mascota.setMasc_estado(0);  // Cambiamos el estado de la mascota a Inactivo (0)
+                    mascota.setMasc_estado(0); 
                 }
             } 
-            // Si la adopción es Rechazada (2)
-            else if (nuevoEstado == 2) {
-                // Si la mascota ya está inactiva (estado 0), no cambiamos el estado
+           
+            else if (nuevoEstado == 2) {             
                 if (mascota.getMasc_estado() == 0) {
-                    // No se hace ningún cambio en el estado de la mascota
                 }
             }
 
-            // Guardar los cambios en la mascota
             mascotaRepository.save(mascota);  
 
-            // Guardar el nuevo estado de la adopción
             adopcion.setAdop_estado(nuevoEstado); 
             return adopcionRepository.save(adopcion); 
         } else {  
-            return null;  // Si la adopción no existe, devolver null  
+            return null;  
         } 
     } 
     
@@ -129,7 +123,4 @@ public class AdopcionService {
         UsuarioEntity usuarioLogueado = usuarioService.obtenerUsuarioLogueado(token);
         return adopcionRepository.findByUsuario(usuarioLogueado);
     }
-
-
-
 }
