@@ -1,11 +1,7 @@
 package backend.backend_adprso.Service.Usuario;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import backend.backend_adprso.Entity.Adopcion.AdopcionEntity;
-import backend.backend_adprso.Entity.Adopcion.AdopcionRequestDTO;
-import backend.backend_adprso.Entity.Mascota.MascotaEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,10 +20,8 @@ public class UsuarioService {
     UsuarioRepository usuarioRepository;
     @Autowired
     TipoUsuarioRepository tipoUsuarioRepository;
-
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
     

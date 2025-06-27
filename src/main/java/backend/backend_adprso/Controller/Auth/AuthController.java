@@ -1,8 +1,6 @@
 package backend.backend_adprso.Controller.Auth;
 
-import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import backend.backend_adprso.Controller.Response.ApiResponse;
 import backend.backend_adprso.Entity.Usuario.ForgotPasswordRequest;
-import backend.backend_adprso.Entity.Usuario.PasswordResetTokenEntity;
 import backend.backend_adprso.Entity.Usuario.UsuarioEntity;
 import backend.backend_adprso.Service.AuthService.AuthService;
 import backend.backend_adprso.Service.Usuario.ResetPasswordRequest;

@@ -1,6 +1,5 @@
 package backend.backend_adprso.Controller.Usuario;
 
-import backend.backend_adprso.Service.AuthService.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PathVariable;

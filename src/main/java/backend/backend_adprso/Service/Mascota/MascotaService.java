@@ -316,7 +316,6 @@ public class MascotaService {
             cell5.setCellValue(gustos);
             cell5.setCellStyle(normalStyle);
         }
-
         if (mascotas.isEmpty()) {
             Row row = sheet.createRow(1);  
             for (int i = 0; i < headers.length; i++) {
@@ -324,11 +323,9 @@ public class MascotaService {
                 cell.setCellStyle(normalStyle);
             }
         }
-
         for (int i = 0; i < headers.length; i++) {
             sheet.autoSizeColumn(i);  
         }
-
         workbook.write(outputStream);
         workbook.close();
     } 
