@@ -68,7 +68,6 @@ public class AdopcionAdminController {
         return new ApiResponse<>("success", 200, adopcion, "Adopción encontrada");
     }
 
-
     @PutMapping("/{id}/estado")
     public ResponseEntity<ApiResponse<AdopcionEntity>> cambiarEstado(
         @PathVariable Long id, 
@@ -98,6 +97,17 @@ public class AdopcionAdminController {
             return new ApiResponse<>("success", HttpStatus.OK.value(), mascotas, "Mascotas encontradas.");
         } catch (Exception e) {
             return new ApiResponse<>("error", HttpStatus.INTERNAL_SERVER_ERROR.value(), null, "Hubo un error al procesar la solicitud.");
+        }
+    }
+
+    @PutMapping("/volver-a-pendiente/{adopId}")
+    public ResponseEntity<AdopcionEntity> volverAPendiente(@PathVariable Long adopId) {
+        AdopcionEntity adopcion = adopcionService.VolverAPendiente(adopId);
+
+        if (adopcion != null) {
+            return ResponseEntity.ok(adopcion); // Devuelve la adopción actualizada
+        } else {
+            return ResponseEntity.notFound().build(); // Devuelve un 404 si no se encuentra la adopción
         }
     }
 }

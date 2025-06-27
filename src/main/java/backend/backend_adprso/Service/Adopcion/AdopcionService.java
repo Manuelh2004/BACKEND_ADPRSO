@@ -70,45 +70,60 @@ public class AdopcionService {
         return adopcionRepository.findByEvenEstado(2); 
     }
 
+    // 0 - pendiente
+    // 1 - aceptada
+    // 2 - rechazada 
     @Transactional
     public AdopcionEntity cambiarEstadoAdopcion(Long adopId, Integer nuevoEstado) {
-        Optional<AdopcionEntity> adopcionExistente = adopcionRepository.findById(adopId);
-        
+        Optional<AdopcionEntity> adopcionExistente = adopcionRepository.findById(adopId);        
+
         if (adopcionExistente.isPresent()) {
             AdopcionEntity adopcion = adopcionExistente.get();
-            // Cambiar el estado de la adopción
-            MascotaEntity mascota = adopcion.getMascota();
+            MascotaEntity mascota = adopcion.getMascota(); 
 
-            // 0 - pendiente
-            // 1 - aceptada
-            // 2 - rechazada 
-
-            // Si el nuevo estado es 1, cambiar el estado de la mascota a 0 (adoptada)
-            if (mascota.getMasc_estado() == 0) {                
-                if (nuevoEstado == 1){                   
-                    mascota.setMasc_estado(0);
+            // Si la adopción es Aceptada (1)
+            if (nuevoEstado == 1) {
+                // Solo cambiamos el estado de la mascota si está activa (estado 1)
+                if (mascota.getMasc_estado() == 1) {
+                    mascota.setMasc_estado(0);  // Cambiamos el estado de la mascota a Inactivo (0)
                 }
-                else if(nuevoEstado == 2){
-                    mascota.setMasc_estado(0);
+            } 
+            // Si la adopción es Rechazada (2)
+            else if (nuevoEstado == 2) {
+                // Si la mascota ya está inactiva (estado 0), no cambiamos el estado
+                if (mascota.getMasc_estado() == 0) {
+                    // No se hace ningún cambio en el estado de la mascota
                 }
             }
-            if(mascota.getMasc_estado() == 1){
-                if (nuevoEstado == 1){                   
-                    mascota.setMasc_estado(0);
-                }
-                else if(nuevoEstado == 2){
-                    mascota.setMasc_estado(1);
-                }
-            }
-            
-            mascotaRepository.save(mascota);  // Guardar los cambios en la mascota
-            // Guardar la adopción con el nuevo estado
-            return adopcionRepository.save(adopcion);
-        } else {
-            return null;  // Si la adopción no existe, devolver null
-        }
-    }
 
+            // Guardar los cambios en la mascota
+            mascotaRepository.save(mascota);  
+
+            // Guardar el nuevo estado de la adopción
+            adopcion.setAdop_estado(nuevoEstado); 
+            return adopcionRepository.save(adopcion); 
+        } else {  
+            return null;  // Si la adopción no existe, devolver null  
+        } 
+    } 
+    
+    @Transactional
+    public AdopcionEntity VolverAPendiente(Long adopId) {
+        Optional<AdopcionEntity> adopcionExistente = adopcionRepository.findById(adopId);       
+
+        if (adopcionExistente.isPresent()) {
+            AdopcionEntity adopcion = adopcionExistente.get();              
+            MascotaEntity mascota = adopcion.getMascota();  
+
+            adopcion.setAdop_estado(0); 
+            mascota.setMasc_estado(1); 
+
+            mascotaRepository.save(mascota);                    
+            return adopcionRepository.save(adopcion); 
+        } else {  
+            return null;  
+        } 
+    } 
 
     public List<AdopcionEntity> listarAdopcionesDelUsuario(String token) {
         UsuarioEntity usuarioLogueado = usuarioService.obtenerUsuarioLogueado(token);
