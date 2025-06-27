@@ -24,7 +24,8 @@ public class UsuarioService {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    
+
+    @Autowired
     private JwtUtil jwtUtil;
 
     public UsuarioService(@Autowired PasswordEncoder passwordEncoder) {
@@ -94,5 +95,15 @@ public class UsuarioService {
             throw new RuntimeException("Token no válido");
         }
         return token;
+    }
+
+    public UsuarioEntity editarPerfil( String token, UsuarioEntity usuario) {
+        UsuarioEntity usuarioLogueado = obtenerUsuarioLogueado(token);
+        usuarioLogueado.setUsr_telefono(usuario.getUsr_telefono());
+        usuarioLogueado.setUsr_nombre(usuario.getUsr_nombre());
+        usuarioLogueado.setUsr_direccion(usuario.getUsr_direccion());
+        usuarioLogueado.setUsr_apellido(usuario.getUsr_apellido());
+        usuarioRepository.save(usuarioLogueado);
+        return null;
     }
 }
