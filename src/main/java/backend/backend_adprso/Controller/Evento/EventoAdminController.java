@@ -20,6 +20,7 @@ import backend.backend_adprso.Entity.Usuario.UsuarioEntity;
 import backend.backend_adprso.Service.Evento.EventoService;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/admin/api/evento")
@@ -43,6 +44,23 @@ public class EventoAdminController {
         );
     }
 
+    @PostMapping("/registrar-evento-imagen")
+    public ResponseEntity<ApiResponse<EventoEntity>> registrarEventoConImagen(
+            @RequestPart("evento") EventoEntity evento,
+            @RequestPart("imagen") MultipartFile imagen) {
+        try {
+            EventoEntity creado = eventoService.RegistrarEventoConImagen(evento, imagen);
+            return ResponseEntity.status(201).body(
+                    new ApiResponse<>("success", 201, creado, "Evento creado exitosamente con imagen")
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(
+                    new ApiResponse<>("error", 500, null, "Error al crear el evento con imagen")
+            );
+        }
+    }
+
+
     @PutMapping("/{id}") 
     public ResponseEntity<ApiResponse<EventoEntity>> actualizarEvento(
         @PathVariable Long id, 
@@ -59,6 +77,30 @@ public class EventoAdminController {
             );
         }
     }
+
+    @PutMapping("/{id}/actualizar-evento")
+    public ResponseEntity<ApiResponse<EventoEntity>> actualizarEventoConImagen(
+            @PathVariable Long id,
+            @RequestPart("evento") EventoEntity eventoActualizado,
+            @RequestPart(name = "imagen", required = false) MultipartFile nuevaImagen) {
+        try {
+            EventoEntity actualizado = eventoService.ActualizarEventoConImagen(id, eventoActualizado, nuevaImagen);
+            if (actualizado != null) {
+                return ResponseEntity.ok(
+                        new ApiResponse<>("success", 200, actualizado, "Evento actualizado con imagen correctamente")
+                );
+            } else {
+                return ResponseEntity.status(404).body(
+                        new ApiResponse<>("error", 404, null, "Evento no encontrado")
+                );
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(
+                    new ApiResponse<>("error", 500, null, "Error al actualizar evento con imagen")
+            );
+        }
+    }
+
 
     @PutMapping("/{id}/estado")
     public ResponseEntity<ApiResponse<EventoEntity>> cambiarEstado(

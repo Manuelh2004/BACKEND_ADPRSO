@@ -2,10 +2,12 @@ package backend.backend_adprso.Service.Evento;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import backend.backend_adprso.Entity.Adopcion.AdopcionEntity;
+import backend.backend_adprso.Service.Cloudinary.CloudinaryService;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
@@ -21,6 +23,7 @@ import backend.backend_adprso.Service.Usuario.UsuarioService;
 import jakarta.transaction.Transactional;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -36,6 +39,9 @@ public class EventoService {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private CloudinaryService cloudinaryService;
 
     public List<EventoEntity> ListarEventos() {
         return eventoRepository.findAll();
@@ -59,6 +65,17 @@ public class EventoService {
     }
 
     public EventoEntity RegistrarEvento(EventoEntity evento) {
+        evento.setEven_estado(1);
+        return eventoRepository.save(evento);
+    }
+
+    public EventoEntity RegistrarEventoConImagen(EventoEntity evento, MultipartFile imagen) throws IOException {
+        if (imagen != null && !imagen.isEmpty()) {
+            Map<String, Object> resultado = cloudinaryService.subirImagen(imagen);
+            evento.setEven_imagen((String) resultado.get("secure_url"));
+            evento.setEven_imagen_public_id((String) resultado.get("public_id"));
+        }
+
         evento.setEven_estado(1);
         return eventoRepository.save(evento);
     }
@@ -98,6 +115,37 @@ public class EventoService {
             return eventoRepository.save(evento);
         } else {
             return null; 
+        }
+    }
+
+    public EventoEntity ActualizarEventoConImagen(Long id, EventoEntity eventoActualizado, MultipartFile nuevaImagen) throws IOException {
+        Optional<EventoEntity> eventoExistente = eventoRepository.findById(id);
+
+        if (eventoExistente.isPresent()) {
+            EventoEntity evento = eventoExistente.get();
+
+            if (nuevaImagen != null && !nuevaImagen.isEmpty()) {
+                // Eliminar imagen anterior
+                if (evento.getEven_imagen_public_id() != null) {
+                    cloudinaryService.eliminarImagen(evento.getEven_imagen_public_id());
+                }
+                // Subir nueva imagen
+                Map<String, Object> resultado = cloudinaryService.subirImagen(nuevaImagen);
+                evento.setEven_imagen((String) resultado.get("secure_url"));
+                evento.setEven_imagen_public_id((String) resultado.get("public_id"));
+            }
+
+            // Actualizar otros campos
+            if (eventoActualizado.getEven_nombre() != null) evento.setEven_nombre(eventoActualizado.getEven_nombre());
+            if (eventoActualizado.getEven_descripcion() != null) evento.setEven_descripcion(eventoActualizado.getEven_descripcion());
+            if (eventoActualizado.getEven_fecha_inicio() != null) evento.setEven_fecha_inicio(eventoActualizado.getEven_fecha_inicio());
+            if (eventoActualizado.getEven_fecha_fin() != null) evento.setEven_fecha_fin(eventoActualizado.getEven_fecha_fin());
+            if (eventoActualizado.getEven_lugar() != null) evento.setEven_lugar(eventoActualizado.getEven_lugar());
+            if (eventoActualizado.getEven_estado() != null) evento.setEven_estado(eventoActualizado.getEven_estado());
+
+            return eventoRepository.save(evento);
+        } else {
+            return null;
         }
     }
 

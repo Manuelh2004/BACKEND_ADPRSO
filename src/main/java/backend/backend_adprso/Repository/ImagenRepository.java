@@ -20,5 +20,6 @@ public interface ImagenRepository extends JpaRepository<ImagenEntity, Long>{
     @Transactional
     @Query("DELETE FROM ImagenEntity i WHERE i.mascota.masc_id = :mascId")
     void deleteByMascotaId(@Param("mascId") Long mascId);  // Eliminar imágenes por mascota
-   
+
+    ImagenEntity findByImaPublicId(String url);
 }

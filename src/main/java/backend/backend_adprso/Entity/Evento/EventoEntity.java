@@ -31,4 +31,6 @@ public class EventoEntity {
     private String even_imagen;
     @Column
     private Integer even_estado;
+    @Column
+    private String even_imagen_public_id;
 }

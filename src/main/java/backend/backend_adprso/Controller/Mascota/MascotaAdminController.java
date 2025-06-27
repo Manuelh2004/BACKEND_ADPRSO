@@ -5,20 +5,14 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import backend.backend_adprso.Controller.Response.ApiResponse;
 import backend.backend_adprso.Entity.Evento.EventoEntity;
 import backend.backend_adprso.Entity.Mascota.MascotaConGustosDTO;
 import backend.backend_adprso.Entity.Mascota.MascotaEntity;
 import backend.backend_adprso.Service.Mascota.MascotaService;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/admin/api/mascota")
@@ -34,25 +28,29 @@ public class MascotaAdminController {
     }
 
     @PostMapping("/registrar_mascota")
-    public ResponseEntity<ApiResponse<MascotaEntity>> registrarMascota(@RequestBody MascotaConGustosDTO request) {
-        // Llamamos al servicio pasando las URLs de las imágenes también
-        MascotaEntity mascotaGuardada = mascotaService.RegistrarMascota(request.getMascota(), request.getGustosIds(), request.getImagenUrls());
+    public ResponseEntity<ApiResponse<MascotaEntity>> registrarMascota(
+            @RequestPart("mascota") MascotaEntity mascota,
+            @RequestPart("gustos") List<Long> gustosIds,
+            @RequestPart(value = "imagenes", required = false) List<MultipartFile> imagenes) {
 
-        ApiResponse<MascotaEntity> response = new ApiResponse<>("success", 201, mascotaGuardada, "Mascota registrada correctamente con gustos e imágenes");
+        MascotaEntity mascotaGuardada = mascotaService.RegistrarMascota(mascota, gustosIds, imagenes);
+
+        ApiResponse<MascotaEntity> response = new ApiResponse<>("success", 201, mascotaGuardada, "Mascota registrada correctamente con imágenes y gustos");
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-   @PutMapping("/{id}")
-    public ResponseEntity<MascotaEntity> updateMascota(@PathVariable Long id, @RequestBody MascotaUpdateRequest request) {
-        try {
-            // Llamamos al servicio pasando el ID de la mascota, los detalles y los nuevos gustos/imágenes
-            MascotaEntity updatedMascota = mascotaService.updateMascota(id, request.getMascota(), request.getImagenUrls(), request.getNewGustos());
-            return new ResponseEntity<>(updatedMascota, HttpStatus.OK);
-        } catch (RuntimeException e) {
-            // En caso de que no se encuentre la mascota o algún error en el proceso
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+    @PutMapping("/{id}")
+    public ResponseEntity<MascotaEntity> updateMascota(
+            @PathVariable Long id,
+            @RequestPart("mascota") MascotaEntity mascota,
+            @RequestPart("gustos") List<Long> gustosIds,
+            @RequestPart(value = "imagenes", required = false) List<MultipartFile> nuevasImagenes,
+            @RequestPart(value = "imagenesAEliminar", required = false) List<String> imagenesAEliminar
+    ) {
+        MascotaEntity updated = mascotaService.updateMascota(id, mascota, nuevasImagenes, gustosIds, imagenesAEliminar);
+        return ResponseEntity.ok(updated);
     }
+
 
     @PutMapping("/{id}/estado")
     public ResponseEntity<ApiResponse<MascotaEntity>> cambiarEstado(
