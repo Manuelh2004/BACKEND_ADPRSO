@@ -1,7 +1,13 @@
 package backend.backend_adprso.Controller.Mascota;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.http.HttpHeaders;
 import java.util.List;
 
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -93,6 +99,7 @@ public class MascotaAdminController {
             new ApiResponse<>("success", 200, mascota, null)
         );
     }
+
     @GetMapping("/inactivos")
     public ResponseEntity<ApiResponse<List<MascotaEntity>>> listarEventosInactivos() {
         List<MascotaEntity> mascota = mascotaService.listarMascotasInactivas();
@@ -100,4 +107,36 @@ public class MascotaAdminController {
             new ApiResponse<>("success", 200, mascota, null)
         );
     }
+    /*
+
+     @GetMapping("/descargarExcel")
+    public ResponseEntity<?> descargarExcelMascotas() {
+        try {
+            // Llamar al servicio para generar el archivo Excel
+            mascotaService.generarExcelMascotas();
+
+            // Crear el archivo para enviarlo
+            File file = new File("mascotas.xlsx");
+
+            // Verificar si el archivo existe
+            if (!file.exists()) {
+                return new ResponseEntity<>("El archivo no se pudo generar", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            // Configurar los encabezados HTTP para la respuesta
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Content-Disposition", "attachment; filename=mascotas.xlsx");
+
+            // Leer el archivo como flujo de entrada
+            FileInputStream fileInputStream = new FileInputStream(file);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(fileInputStream);
+        } catch (IOException e) {
+            return new ResponseEntity<>("Error al generar el archivo Excel", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+     */
 }

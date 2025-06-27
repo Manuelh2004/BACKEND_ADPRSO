@@ -1,11 +1,19 @@
 package backend.backend_adprso.Service.Mascota;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.apache.poi.ss.usermodel.*;
 
 import backend.backend_adprso.Entity.Mascota.MascotaDetalleDTO;
+
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +27,10 @@ import backend.backend_adprso.Repository.GustoMascotaRepository;
 import backend.backend_adprso.Repository.GustoRepository;
 import backend.backend_adprso.Repository.ImagenRepository;
 import backend.backend_adprso.Repository.MascotaRepository;
+
 import jakarta.transaction.Transactional;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 
 @Service
 public class MascotaService {
@@ -230,6 +241,52 @@ public class MascotaService {
     public List<MascotaEntity> listarMascotasInactivas() {
         return mascotaRepository.findByMascEstado(0); 
     } 
+
+    @Transactional
+    public void generarExcelMascotas() throws IOException {
+        List<MascotaEntity> mascotas = mascotaRepository.findAll();
+
+        // Crear un libro de trabajo de Excel
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Mascotas");
+
+        // Crear la fila de encabezado
+        Row headerRow = sheet.createRow(0);
+        String[] headers = {"ID", "Nombre", "Edad", "Especie", "Raza", "Gusto"};
+        for (int i = 0; i < headers.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(headers[i]);
+        }
+
+        // Llenar las filas con los datos de las mascotas
+        int rowNum = 1;
+        for (MascotaEntity mascota : mascotas) {
+            Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(mascota.getMasc_id());
+            row.createCell(1).setCellValue(mascota.getMasc_nombre());
+            row.createCell(2).setCellValue(mascota.getMasc_fecha_nacimiento());
+            row.createCell(3).setCellValue(mascota.getTipo_mascota().getTipma_nombre());
+            row.createCell(4).setCellValue(mascota.getSexo().getSex_nombre());
+
+            // Si la entidad GustoEntity está relacionada, agregar el gusto de la mascota
+            if (mascota.getGustoMascotaList() != null && !mascota.getGustoMascotaList().isEmpty()) {
+                StringBuilder gustos = new StringBuilder();
+                for (GustoMascotaEntity gustoMascota : mascota.getGustoMascotaList()) {
+                    gustos.append(gustoMascota.getGust_id().getGust_nombre()).append(", ");
+                }
+                row.createCell(5).setCellValue(gustos.toString().replaceAll(", $", ""));
+            }
+        }
+
+        // Escribir el archivo Excel
+        try (FileOutputStream fileOut = new FileOutputStream("mascotas.xlsx")) {
+            workbook.write(fileOut);
+        }
+
+        // Cerrar el workbook
+        workbook.close();
+    }
+
     // Filtros *****************************************************
     public List<MascotaEntity> filtrarPorSexo(Long sexId) {
         return mascotaRepository.findBySexo(sexId);
