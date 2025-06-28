@@ -5,18 +5,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.poi.ss.usermodel.*;
 
 import backend.backend_adprso.Entity.Mascota.MascotaDetalleDTO;
-
+import backend.backend_adprso.Service.Cloudinary.CloudinaryService;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import backend.backend_adprso.Entity.Evento.EventoEntity;
 import backend.backend_adprso.Entity.Items.GustoEntity;
 import backend.backend_adprso.Entity.Items.ImagenEntity;
 import backend.backend_adprso.Entity.Mascota.GustoMascotaEntity;
@@ -28,6 +28,7 @@ import backend.backend_adprso.Repository.ImagenRepository;
 import backend.backend_adprso.Repository.MascotaRepository;
 
 import jakarta.transaction.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class MascotaService {
@@ -39,6 +40,8 @@ public class MascotaService {
     GustoRepository gustoRepository;
     @Autowired
     ImagenRepository imagenRepository;
+    @Autowired
+    private CloudinaryService cloudinaryService;
 
     @Transactional
     public List<MascotaEntity> listarMascotas() {
@@ -102,7 +105,7 @@ public class MascotaService {
                 ? List.of()
                 : e.getImagenes()
                 .stream()
-                .map(ImagenEntity::getIma_url)  // asumiendo campo imag_url
+                .map(ImagenEntity::getImaUrl)  // asumiendo campo imag_url
                 .toList();
         dto.setImagenes_url(urls);
 
@@ -110,32 +113,34 @@ public class MascotaService {
     }
     
     @Transactional
-    public MascotaEntity RegistrarMascota(MascotaEntity mascota, List<Long> gustosIds, List<String> imagenUrls) {
+    public MascotaEntity RegistrarMascota(MascotaEntity mascota, List<Long> gustosIds, List<MultipartFile> imagenes) {
         mascota.setMasc_estado(1);
         mascota.setMasc_fecha_registro(LocalDate.now());
 
         MascotaEntity mascotaGuardada = mascotaRepository.save(mascota);
 
         List<GustoEntity> gustos = gustoRepository.findAllById(gustosIds);
-
         List<GustoMascotaEntity> gustosMascota = gustos.stream().map(gusto -> {
             GustoMascotaEntity gm = new GustoMascotaEntity();
             gm.setMasc_id(mascotaGuardada);
             gm.setGust_id(gusto);
             return gm;
         }).collect(Collectors.toList());
-
         gustoMascotaRepository.saveAll(gustosMascota);
 
-        if (imagenUrls != null && !imagenUrls.isEmpty()) {
-            List<ImagenEntity> imagenes = imagenUrls.stream().map(imagenUrl -> {
-                ImagenEntity imagen = new ImagenEntity();
-                imagen.setIma_url(imagenUrl);
-                imagen.setMascota(mascotaGuardada); 
-                return imagen;
-            }).collect(Collectors.toList());
-
-            imagenRepository.saveAll(imagenes);
+        if (imagenes != null && !imagenes.isEmpty()) {
+            for (MultipartFile imagen : imagenes) {
+                try {
+                    Map<String, Object> resultado = cloudinaryService.subirImagen(imagen);
+                    ImagenEntity img = new ImagenEntity();
+                    img.setImaUrl((String) resultado.get("secure_url"));
+                    img.setImaPublicId((String) resultado.get("public_id"));
+                    img.setMascota(mascotaGuardada);
+                    imagenRepository.save(img);
+                } catch (IOException e) {
+                    e.printStackTrace(); // o usa logger
+                }
+            }
         }
 
         return mascotaGuardada;
@@ -146,7 +151,7 @@ public class MascotaService {
         
         return mascotas.stream().map(mascota -> {          
             List<String> imagenUrls = mascota.getImagenes().stream()
-                                            .map(ImagenEntity::getIma_url)
+                                            .map(ImagenEntity::getImaUrl)
                                             .limit(2)  // Solo las primeras dos imágenes
                                             .collect(Collectors.toList());
             return new MascotaImagenDTO(mascota.getMasc_id(), mascota.getMasc_nombre(), imagenUrls);
@@ -156,66 +161,80 @@ public class MascotaService {
     public List<MascotaEntity> ListarMascotasActivas() {
         return mascotaRepository.findByMascEstado(1);        
     }
-   
+
     @Transactional
-    public MascotaEntity updateMascota(Long id, MascotaEntity mascotaDetails, List<String> updatedImagenes, List<Long> updatedGustos) {
-        // Buscar la mascota por su ID
+    public MascotaEntity updateMascota(Long id, MascotaEntity mascotaDetails, List<MultipartFile> nuevasImagenes, List<Long> updatedGustos, List<String> imagenesAEliminar) {
         Optional<MascotaEntity> existingMascotaOpt = mascotaRepository.findById(id);
 
-        if (existingMascotaOpt.isPresent()) {
-            MascotaEntity existingMascota = existingMascotaOpt.get();
+        if (existingMascotaOpt.isEmpty()) {
+            throw new RuntimeException("Mascota no encontrada con el ID: " + id);
+        }
 
-            // Actualizamos los campos de la mascota
-            existingMascota.setMasc_nombre(mascotaDetails.getMasc_nombre());
-            existingMascota.setMasc_fecha_nacimiento(mascotaDetails.getMasc_fecha_nacimiento());
-            existingMascota.setMasc_historia(mascotaDetails.getMasc_historia());
-            existingMascota.setMasc_observacion(mascotaDetails.getMasc_observacion());
+        MascotaEntity existingMascota = existingMascotaOpt.get();
 
-            // Actualizamos las relaciones
-            existingMascota.setSexo(mascotaDetails.getSexo());
-            existingMascota.setTamanio(mascotaDetails.getTamanio());
-            existingMascota.setNivel_energia(mascotaDetails.getNivel_energia());
-            existingMascota.setTipo_mascota(mascotaDetails.getTipo_mascota());
-            existingMascota.setEstado_salud(mascotaDetails.getEstado_salud());
-            existingMascota.setEstado_vacuna(mascotaDetails.getEstado_vacuna());
+        // Actualizar datos generales
+        existingMascota.setMasc_nombre(mascotaDetails.getMasc_nombre());
+        existingMascota.setMasc_fecha_nacimiento(mascotaDetails.getMasc_fecha_nacimiento());
+        existingMascota.setMasc_historia(mascotaDetails.getMasc_historia());
+        existingMascota.setMasc_observacion(mascotaDetails.getMasc_observacion());
+        existingMascota.setSexo(mascotaDetails.getSexo());
+        existingMascota.setTamanio(mascotaDetails.getTamanio());
+        existingMascota.setNivel_energia(mascotaDetails.getNivel_energia());
+        existingMascota.setTipo_mascota(mascotaDetails.getTipo_mascota());
+        existingMascota.setEstado_salud(mascotaDetails.getEstado_salud());
+        existingMascota.setEstado_vacuna(mascotaDetails.getEstado_vacuna());
 
-            // Guardamos la mascota actualizada
-            MascotaEntity updatedMascota = mascotaRepository.save(existingMascota);
+        MascotaEntity updatedMascota = mascotaRepository.save(existingMascota);
 
-            // 1. Eliminar las imágenes existentes de la mascota antes de agregar las nuevas
-            if (updatedImagenes != null && !updatedImagenes.isEmpty()) {
-                System.out.println("Eliminando imágenes asociadas a la mascota con ID: " + id);
-                imagenRepository.deleteByMascotaId(id);  // Elimina todas las imágenes asociadas a la mascota
-                // Añadimos las nuevas imágenes
-                for (String imagenUrl : updatedImagenes) {
-                    ImagenEntity imagen = new ImagenEntity();
-                    imagen.setMascota(updatedMascota);  // Asociamos la imagen con la mascota actualizada
-                    imagen.setIma_url(imagenUrl);  // Usamos la URL proporcionada
-                    imagenRepository.save(imagen);
-                }
-            }
-
-            // 2. Eliminar los gustos existentes de la mascota antes de agregar los nuevos
-            if (updatedGustos != null && !updatedGustos.isEmpty()) {
-                gustoMascotaRepository.deleteByMascotaId(id);  // Elimina todos los gustos asociados a la mascota
-                // Añadimos los nuevos gustos
-                for (Long gustoId : updatedGustos) {
-                    GustoEntity gustoEntity = gustoRepository.findByGust_id(gustoId);  // Obtenemos el GustoEntity por ID
-                    if (gustoEntity != null) {
-                        GustoMascotaEntity gustoMascota = new GustoMascotaEntity();
-                        gustoMascota.setMasc_id(updatedMascota);  // Asociamos el gusto con la mascota actualizada
-                        gustoMascota.setGust_id(gustoEntity);  // Asignamos el gusto encontrado
-                        gustoMascotaRepository.save(gustoMascota);
+        // ✅ Eliminar solo las imágenes que el usuario marcó para borrar
+        if (imagenesAEliminar != null && !imagenesAEliminar.isEmpty()) {
+            for (String publicId : imagenesAEliminar) {
+                ImagenEntity img = imagenRepository.findByImaPublicId(publicId);
+                System.out.println("Eliminando imagen con publicId: " + publicId);
+                if (img != null) {
+                    try {
+                        cloudinaryService.eliminarImagen(publicId);
+                        imagenRepository.delete(img);
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
             }
-
-            return updatedMascota;
-        } else {
-            // Si no existe una mascota con ese ID, lanzar excepción o devolver null
-            throw new RuntimeException("Mascota no encontrada con el ID: " + id);
         }
+
+        // ✅ Agregar nuevas imágenes
+        if (nuevasImagenes != null) {
+            for (MultipartFile nuevaImagen : nuevasImagenes) {
+                try {
+                    Map<String, Object> resultado = cloudinaryService.subirImagen(nuevaImagen);
+                    ImagenEntity imagen = new ImagenEntity();
+                    imagen.setMascota(updatedMascota);
+                    imagen.setImaUrl((String) resultado.get("secure_url"));
+                    imagen.setImaPublicId((String) resultado.get("public_id"));
+                    imagenRepository.save(imagen);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        // ✅ Actualizar gustos
+        gustoMascotaRepository.deleteByMascotaId(id);
+        if (updatedGustos != null) {
+            for (Long gustoId : updatedGustos) {
+                GustoEntity gustoEntity = gustoRepository.findByGust_id(gustoId);
+                if (gustoEntity != null) {
+                    GustoMascotaEntity gustoMascota = new GustoMascotaEntity();
+                    gustoMascota.setMasc_id(updatedMascota);
+                    gustoMascota.setGust_id(gustoEntity);
+                    gustoMascotaRepository.save(gustoMascota);
+                }
+            }
+        }
+
+        return updatedMascota;
     }
+
 
     @Transactional
     public MascotaEntity cambiarEstadoMascota(Long evenId, Integer nuevoEstado) {
@@ -353,7 +372,7 @@ public class MascotaService {
         List<MascotaEntity> mascotas = mascotaRepository.findByFilters(sexId,tamId,nienId,tipmaId);
         return mascotas.stream().map(mascota -> {
             List<String> imagenUrls = mascota.getImagenes().stream()
-                    .map(ImagenEntity::getIma_url)
+                    .map(ImagenEntity::getImaUrl)
                     .limit(2)  // Solo las primeras dos imágenes
                     .collect(Collectors.toList());
             return new MascotaImagenDTO(mascota.getMasc_id(), mascota.getMasc_nombre(), imagenUrls);
