@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import backend.backend_adprso.Entity.Items.EstadoSaludEntity;
 import backend.backend_adprso.Entity.Items.EstadoVacunaEntity;
@@ -70,6 +71,7 @@ public class MascotaEntity {
     private List<GustoMascotaEntity> gustoMascotaList;
 
     @OneToMany(mappedBy = "mascota")
+    @JsonManagedReference
     private List<ImagenEntity> imagenes;
 
     public List<Map<String, Object>> getGustoNames() {

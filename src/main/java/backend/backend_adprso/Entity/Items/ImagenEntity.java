@@ -19,12 +19,15 @@ import lombok.Data;
 public class ImagenEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long ima_id; 
-    @Column
-    private String ima_url;
+    private Long ima_id;
+    @Column(name = "ima_url")
+    private String imaUrl;
 
     @ManyToOne
     @JoinColumn(name = "masc_id", nullable = false)
     @JsonBackReference
     private MascotaEntity mascota;
+
+    @Column(name = "ima_public_id")
+    private String imaPublicId;
 }
