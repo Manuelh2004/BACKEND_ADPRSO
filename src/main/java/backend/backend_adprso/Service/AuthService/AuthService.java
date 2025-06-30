@@ -128,6 +128,11 @@ public class AuthService {
             throw new RuntimeException("El correo electrónico ya está registrado.");
         }
 
+        // Validar longitud mínima de la contraseña
+        if (usuario.getUsr_password() == null || usuario.getUsr_password().length() < 6) {
+            throw new RuntimeException("La contraseña debe tener al menos 6 caracteres.");
+        }
+        
         // Encriptar la contraseña antes de guardar
         String hashedPassword = passwordEncoder.encode(usuario.getUsr_password());
         usuario.setUsr_password(hashedPassword);
@@ -137,9 +142,7 @@ public class AuthService {
             .orElseThrow(() -> new RuntimeException("Tipo de usuario no encontrado"));
         usuario.setTipoUsuario(tipoUsuario);
 
-        if (usuario.getUsr_email() == null) {
-            usuario.setUsr_estado("activo");
-        }
+        usuario.setUsr_estado("Activo");
 
         usuarioRepository.save(usuario);
 
