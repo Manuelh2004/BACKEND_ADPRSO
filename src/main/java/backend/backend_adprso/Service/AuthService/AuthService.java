@@ -153,8 +153,7 @@ public class AuthService {
         try {
             String subject = "¡Bienvenido al Sistema!";
             String body = "<h1>¡Bienvenido, " + usuario.getUsr_email() + "!</h1>" +
-                        "<p>Gracias por registrarte en nuestro sistema. Estamos felices de tenerte como parte de nuestra comunidad.</p>" +
-                        "<p>Tu token de acceso es: " + token + "</p>";
+                        "<p>Gracias por registrarte en nuestro sistema. Estamos felices de tenerte como parte de nuestra comunidad.</p>";
             emailService.sendEmail(usuario.getUsr_email(), subject, body);
         } catch (MessagingException e) {
             throw new RuntimeException("Error al enviar el correo electrónico de bienvenida", e);
