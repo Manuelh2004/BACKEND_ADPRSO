@@ -167,7 +167,7 @@ public class AuthService {
 
     // Enviar correo de verificación
     try {
-        String verificationLink = "http://localhost:5173/reset-password?token=" + verificationToken;
+        String verificationLink = "http://localhost:5173/verify-email?token=" + verificationToken;
         String subject = "Verificación de correo";
         String body = "<h1>Verificación de correo</h1>" +
                       "<p>Haz clic en el siguiente enlace para activar tu cuenta:</p>" +
