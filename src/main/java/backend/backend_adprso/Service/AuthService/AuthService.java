@@ -41,10 +41,12 @@ public class AuthService {
 
         if (usuarioOpt.isPresent()) {
             UsuarioEntity usuario = usuarioOpt.get();
+
             // Verificar si el usuario está activo
-             if ("Pendiente".equals(usuario.getUsr_estado())) {
-            throw new RuntimeException("Por favor, verifica tu correo electrónico antes de iniciar sesión.");
+            if ("Pendiente".equals(usuario.getUsr_estado())) {
+                throw new RuntimeException("Por favor, verifica tu correo electrónico para activar tu cuenta antes de iniciar sesión. Revisa tu bandeja de entrada o el siguiente enlace para activar tu cuenta.");
             }
+
             String hashedPassword = usuario.getUsr_password(); // contraseña en la BD
 
             // Compara usando BCrypt
