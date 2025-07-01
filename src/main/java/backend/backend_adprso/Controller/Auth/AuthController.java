@@ -115,4 +115,27 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
+
+    @PostMapping("/verify_email")
+    public ResponseEntity<ApiResponse<?>> verifyEmail(@RequestParam String token) {
+    try {
+        authService.verifyEmail(token);
+        ApiResponse<String> response = new ApiResponse<>(
+            "success", 
+            HttpStatus.OK.value(), 
+            null, 
+            "Correo electrónico verificado con éxito."
+        );
+        return ResponseEntity.ok(response);
+     } catch (Exception e) {
+        ApiResponse<String> response = new ApiResponse<>(
+            "error", 
+            HttpStatus.BAD_REQUEST.value(), 
+            null, 
+            e.getMessage()
+        );
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
 }

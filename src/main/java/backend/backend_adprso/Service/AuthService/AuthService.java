@@ -11,9 +11,11 @@ import org.springframework.stereotype.Service;
 import backend.backend_adprso.Entity.Items.TipoUsuarioEntity;
 import backend.backend_adprso.Entity.Usuario.PasswordResetTokenEntity;
 import backend.backend_adprso.Entity.Usuario.UsuarioEntity;
+import backend.backend_adprso.Entity.Usuario.VerificationTokenEntity;
 import backend.backend_adprso.Repository.PasswordResetTokenRepository;
 import backend.backend_adprso.Repository.TipoUsuarioRepository;
 import backend.backend_adprso.Repository.UsuarioRepository;
+import backend.backend_adprso.Repository.VerificationTokenRepository;
 import backend.backend_adprso.Service.EmailService;
 import jakarta.mail.MessagingException;
 
@@ -31,12 +33,18 @@ public class AuthService {
     private PasswordResetTokenRepository passwordResetTokenRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    
+    @Autowired
+    private VerificationTokenRepository verificationTokenRepository;
+
     public String login(String email, String password) {
         Optional<UsuarioEntity> usuarioOpt = usuarioRepository.findByUsrEmail(email);
 
         if (usuarioOpt.isPresent()) {
             UsuarioEntity usuario = usuarioOpt.get();
+            // Verificar si el usuario está activo
+             if ("Pendiente".equals(usuario.getUsr_estado())) {
+            throw new RuntimeException("Por favor, verifica tu correo electrónico antes de iniciar sesión.");
+            }
             String hashedPassword = usuario.getUsr_password(); // contraseña en la BD
 
             // Compara usando BCrypt
@@ -122,43 +130,81 @@ public class AuthService {
     }
 
     public String register(UsuarioEntity usuario) {
-        // Verificar si el usuario ya existe
-        Optional<UsuarioEntity> existingUser = usuarioRepository.findByUsrEmail(usuario.getUsr_email());
-        if (existingUser.isPresent()) {
-            throw new RuntimeException("El correo electrónico ya está registrado.");
-        }
-
-        // Validar longitud mínima de la contraseña
-        if (usuario.getUsr_password() == null || usuario.getUsr_password().length() < 6) {
-            throw new RuntimeException("La contraseña debe tener al menos 6 caracteres.");
-        }
-        
-        // Encriptar la contraseña antes de guardar
-        String hashedPassword = passwordEncoder.encode(usuario.getUsr_password());
-        usuario.setUsr_password(hashedPassword);
-
-        // Obtener el tipo de usuario y asignarlo
-        TipoUsuarioEntity tipoUsuario = tipoUsuarioRepository.findById(2L)
-            .orElseThrow(() -> new RuntimeException("Tipo de usuario no encontrado"));
-        usuario.setTipoUsuario(tipoUsuario);
-
-        usuario.setUsr_estado("Activo");
-
-        usuarioRepository.save(usuario);
-
-        String role = usuario.getTipoUsuario().getTipus_nombre();
-        String token = jwtUtil.generateToken(usuario.getUsr_email(), role);
-
-        // Enviar correo de bienvenida
-        try {
-            String subject = "¡Bienvenido al Sistema!";
-            String body = "<h1>¡Bienvenido, " + usuario.getUsr_email() + "!</h1>" +
-                        "<p>Gracias por registrarte en nuestro sistema. Estamos felices de tenerte como parte de nuestra comunidad.</p>";
-            emailService.sendEmail(usuario.getUsr_email(), subject, body);
-        } catch (MessagingException e) {
-            throw new RuntimeException("Error al enviar el correo electrónico de bienvenida", e);
-        }
-
-        return token;
+    // Verificar si el usuario ya existe
+    Optional<UsuarioEntity> existingUser = usuarioRepository.findByUsrEmail(usuario.getUsr_email());
+    if (existingUser.isPresent()) {
+        throw new RuntimeException("El correo electrónico ya está registrado.");
     }
+
+    // Validar longitud mínima de la contraseña
+    if (usuario.getUsr_password() == null || usuario.getUsr_password().length() < 6) {
+        throw new RuntimeException("La contraseña debe tener al menos 6 caracteres.");
+    }
+    
+    // Encriptar la contraseña antes de guardar
+    String hashedPassword = passwordEncoder.encode(usuario.getUsr_password());
+    usuario.setUsr_password(hashedPassword);
+
+    // Obtener el tipo de usuario y asignarlo
+    TipoUsuarioEntity tipoUsuario = tipoUsuarioRepository.findById(2L)
+        .orElseThrow(() -> new RuntimeException("Tipo de usuario no encontrado"));
+    usuario.setTipoUsuario(tipoUsuario);
+
+    usuario.setUsr_estado("Pendiente"); // Estado de verificación pendiente
+
+    // Guardar el usuario
+    usuarioRepository.save(usuario);
+
+    // Generar token para la verificación del correo
+    String verificationToken = generateToken();
+
+    // Crear la entidad de token de verificación y guardarla en la base de datos
+    VerificationTokenEntity verificationTokenEntity = new VerificationTokenEntity();
+    verificationTokenEntity.setToken(verificationToken);
+    verificationTokenEntity.setUsuario(usuario);
+    verificationTokenEntity.setExpirationDate(LocalDateTime.now().plusHours(1));  // 1 hora de validez
+    verificationTokenRepository.save(verificationTokenEntity);
+
+    // Enviar correo de verificación
+    try {
+        String verificationLink = "http://localhost:5173/reset-password?token=" + verificationToken;
+        String subject = "Verificación de correo";
+        String body = "<h1>Verificación de correo</h1>" +
+                      "<p>Haz clic en el siguiente enlace para activar tu cuenta:</p>" +
+                      "<p><a href='" + verificationLink + "'>Verificar correo</a></p>";
+        emailService.sendEmail(usuario.getUsr_email(), subject, body);
+    } catch (MessagingException e) {
+        throw new RuntimeException("Error al enviar el correo de verificación", e);
+    }
+
+    return verificationToken;  // Retornar el token generado para uso posterior si es necesario
+}
+
+    public void verifyEmail(String token) {
+    // Verificar si el token existe
+    Optional<VerificationTokenEntity> tokenEntity = verificationTokenRepository.findByToken(token);
+    if (!tokenEntity.isPresent()) {
+        throw new RuntimeException("Token inválido o expirado.");
+    }
+
+    VerificationTokenEntity verificationToken = tokenEntity.get();
+
+    // Verificar si el token ha expirado
+    if (verificationToken.getExpirationDate().isBefore(LocalDateTime.now())) {
+        throw new RuntimeException("El token ha expirado.");
+    }
+
+    // Obtener el usuario asociado al token
+    UsuarioEntity usuario = verificationToken.getUsuario();
+
+    // Verificar si el usuario ya está activo
+    if ("Activo".equals(usuario.getUsr_estado())) {
+        throw new RuntimeException("El correo ya ha sido verificado.");
+    }
+
+    // Cambiar el estado del usuario a "Activo"
+    usuario.setUsr_estado("Activo");
+    usuarioRepository.save(usuario);
+}
+
 }
